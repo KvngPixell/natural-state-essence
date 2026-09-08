@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CataloguePage } from "@/components/catalogue-page";
 
-const title = "Natural State Peptides — Research Peptide Catalogue";
+const title = "Catalogue — Natural State Peptides";
 const description =
-  "Explore high-purity research compounds from Natural State Peptides, an Arkansas research supplier focused on transparent third-party testing and documentation.";
+  "Browse the current Natural State Peptides research catalogue, including peptides, blends, and research compounds with available testing documentation.";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/catalogue")({
   head: () => ({
     meta: [
       { title },
