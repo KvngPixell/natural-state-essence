@@ -107,11 +107,11 @@ function ContactPage() {
 
           <ul className="mt-9 space-y-6">
             <li className="flex gap-4">
-              <Mail className="mt-1 size-4 shrink-0 text-accent" strokeWidth={1.4} />
+              <Facebook className="mt-1 size-4 shrink-0 text-accent" strokeWidth={1.4} />
               <div className="min-w-0">
-                <p className="text-sm font-medium text-primary">Email</p>
-                <p className="text-sm break-words text-muted-foreground">
-                  Email address to be added
+                <p className="text-sm font-medium text-primary">Message us on Facebook</p>
+                <p className="text-sm text-muted-foreground">
+                  All inquiries are handled through our Facebook page at this time.
                 </p>
               </div>
             </li>
@@ -125,26 +125,21 @@ function ContactPage() {
             <li className="flex gap-4">
               <Clock className="mt-1 size-4 shrink-0 text-accent" strokeWidth={1.4} />
               <div>
-                <p className="text-sm font-medium text-primary">Response time</p>
-                <p className="text-sm text-muted-foreground">
-                  To be confirmed
-                </p>
+                <p className="text-sm font-medium text-primary">Email & phone</p>
+                <p className="text-sm text-muted-foreground">Coming soon</p>
               </div>
             </li>
           </ul>
 
-          <p className="mt-8 text-sm text-muted-foreground">
-            Follow us on{" "}
-            <a
-              href={FACEBOOK_URL}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="border-b border-accent/60 text-primary transition-colors hover:text-accent"
-            >
-              Facebook
-            </a>
-            .
-          </p>
+          <a
+            href={FACEBOOK_URL}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="mt-9 inline-flex items-center gap-2 rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            <Facebook className="size-4" strokeWidth={1.5} />
+            Message us on Facebook
+          </a>
 
           <div className="mt-8 rounded-lg border border-border bg-secondary/50 p-6">
             <p className="text-sm leading-relaxed text-foreground/75">

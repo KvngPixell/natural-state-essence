@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Facebook } from "lucide-react";
 
 /** Official Natural State Peptides Facebook page. */
-export const FACEBOOK_URL = "https://www.facebook.com/naturalstatepeptides";
+export const FACEBOOK_URL = "https://www.facebook.com/share/1BmaMJNCSj/?mibextid=wwXIfr";
 
 const links = [
   { to: "/catalog", label: "Catalog" },
