@@ -15,26 +15,26 @@ const trustItems = [
   },
   {
     icon: BadgeCheck,
-    title: "Third-Party Tested",
-    copy: "Independent testing documentation where available.",
+    title: "Product Documentation",
+    copy: "Ask which reports are available for your product.",
   },
   {
     icon: Leaf,
-    title: "High Purity",
-    copy: "Quality-focused sourcing and handling standards.",
+    title: "Product Inquiries",
+    copy: "Contact us with product and availability questions.",
   },
   {
     icon: FileText,
-    title: "Transparent COA Access",
-    copy: "Documentation made available for each listed compound.",
+    title: "COA Upon Request",
+    copy: "Request report details, source, and applicable lot.",
   },
 ];
 
 const qualityPoints = [
-  "Third-Party Testing",
-  "Purity Verification",
-  "Transparent Documentation",
-  "Quality-Focused Standards",
+  "Product & Strength",
+  "Report Source",
+  "Applicable Lot",
+  "Available Documentation",
 ];
 
 export function CatalogPage() {
@@ -82,14 +82,13 @@ export function CatalogPage() {
           className="absolute inset-0 -z-10 size-full object-cover"
         />
         <div className="absolute inset-0 -z-10 bg-background/72" />
-        <div className="mx-auto max-w-3xl px-5 py-28 text-center sm:px-8 sm:py-36">
+        <div className="mx-auto max-w-3xl px-5 py-16 text-center sm:px-8 sm:py-24">
           <p className="eyebrow fade-up">Natural State Peptides</p>
           <h1 className="fade-up mt-6 font-serif text-5xl leading-[1.05] text-primary sm:text-6xl lg:text-7xl">
             Our Research Peptides
           </h1>
           <p className="fade-up mx-auto mt-6 max-w-xl text-base leading-relaxed text-foreground/75 sm:text-lg">
-            Explore high-purity research compounds with transparent third-party testing and
-            quality-focused standards.
+            Explore our research compounds, check availability, and request product documentation.
           </p>
           <div className="fade-up mt-10 flex flex-col justify-center gap-3 sm:flex-row">
             <a
@@ -130,8 +129,8 @@ export function CatalogPage() {
           Explore the Collection
         </h2>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-foreground/75">
-          Browse our current research compounds and access available product information and
-          testing documentation.
+          Browse our current research compounds and access available product information and testing
+          documentation.
         </p>
 
         <div className="mt-12 grid gap-3 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
@@ -200,6 +199,29 @@ export function CatalogPage() {
           </div>
         </div>
 
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+          <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
+            {visible.length} {visible.length === 1 ? "product" : "products"} shown
+          </p>
+          {(query ||
+            category !== "All Products" ||
+            availability !== "All" ||
+            sort !== "default") && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setCategory("All Products");
+                setAvailability("All");
+                setSort("default");
+              }}
+              className="rounded-md px-4 py-3 text-sm text-primary underline underline-offset-4 hover:text-accent"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+
         {visible.length > 0 ? (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visible.map((p) => (
@@ -222,8 +244,8 @@ export function CatalogPage() {
               Research with Confidence
             </h2>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-foreground/75">
-              Transparent testing, consistent quality standards, and accessible documentation
-              support informed research decisions.
+              Know what documentation supports your research material. Contact us for available
+              reports and clarification about their source and scope.
             </p>
             <Link
               to="/quality"
@@ -234,10 +256,7 @@ export function CatalogPage() {
           </div>
           <ul className="grid gap-4 sm:grid-cols-2">
             {qualityPoints.map((point) => (
-              <li
-                key={point}
-                className="rounded-lg border border-border bg-card p-6 shadow-soft"
-              >
+              <li key={point} className="rounded-lg border border-border bg-card p-6 shadow-soft">
                 <BadgeCheck className="size-5 text-accent" strokeWidth={1.4} />
                 <p className="mt-4 font-serif text-xl text-primary">{point}</p>
               </li>

@@ -83,7 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Arkansas-based research peptide supplier focused on transparent testing and documentation.",
+          "Arkansas-based research peptide supplier. Explore the catalog and request available product documentation.",
       },
       { name: "author", content: "Natural State Peptides" },
       { property: "og:site_name", content: "Natural State Peptides" },

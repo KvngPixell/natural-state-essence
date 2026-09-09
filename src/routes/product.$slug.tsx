@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { BadgeCheck, FileText, FlaskConical, Leaf } from "lucide-react";
+import { FileText, FlaskConical } from "lucide-react";
 
 import { getProductBySlug, products, RESEARCH_DISCLAIMER } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
@@ -9,9 +9,7 @@ import { StatusBadge } from "@/components/status-badge";
 
 const badges = [
   { icon: FlaskConical, label: "Research Use Only" },
-  { icon: BadgeCheck, label: "Third-Party Tested" },
-  { icon: Leaf, label: "High Purity" },
-  { icon: FileText, label: "Transparent Results" },
+  { icon: FileText, label: "COA Requests Welcome" },
 ];
 
 export const Route = createFileRoute("/product/$slug")({
@@ -23,7 +21,10 @@ export const Route = createFileRoute("/product/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Product not found — Natural State Peptides" }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: "Product not found — Natural State Peptides" },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
     const title = `${loaderData.product.name} — Natural State Peptides`;
@@ -75,9 +76,7 @@ function ProductDetail() {
                 <p className="eyebrow">{product.category}</p>
                 <StatusBadge status={product.status} />
               </div>
-              <h1 className="mt-4 font-serif text-5xl text-primary sm:text-6xl">
-                {product.name}
-              </h1>
+              <h1 className="mt-4 font-serif text-5xl text-primary sm:text-6xl">{product.name}</h1>
               <p className="mt-3 text-base text-muted-foreground">{product.strength}</p>
               <p className="mt-6 max-w-lg text-base leading-relaxed text-foreground/75">
                 {product.shortDescription}
@@ -95,14 +94,27 @@ function ProductDetail() {
                 ))}
               </ul>
 
-              <a
-                href={product.coaUrl}
-                className="mt-8 inline-flex rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
-              >
-                View COA
-              </a>
-              <p className="mt-3 text-xs text-muted-foreground">
-                Certificate of analysis available on request.
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <Link
+                  to="/contact"
+                  search={{ product: product.slug, intent: "product" }}
+                  className="inline-flex justify-center rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  {product.status === "Coming Soon"
+                    ? "Ask About Availability"
+                    : "Inquire About This Product"}
+                </Link>
+                <Link
+                  to="/contact"
+                  search={{ product: product.slug, intent: "coa" }}
+                  className="inline-flex justify-center rounded-md border border-primary/25 px-7 py-3.5 text-sm text-primary transition-colors hover:border-accent"
+                >
+                  Request COA
+                </Link>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Documentation is shared upon request, where available. Ask us to confirm the report
+                source and applicable lot.
               </p>
             </div>
           </div>
@@ -122,9 +134,7 @@ function ProductDetail() {
 
         <div className="mt-16 rounded-lg border border-border bg-secondary/50 p-7">
           <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Disclaimer</p>
-          <p className="mt-3 text-sm leading-relaxed text-foreground/75">
-            {RESEARCH_DISCLAIMER}
-          </p>
+          <p className="mt-3 text-sm leading-relaxed text-foreground/75">{RESEARCH_DISCLAIMER}</p>
         </div>
       </section>
 

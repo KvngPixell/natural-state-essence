@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Clock, Facebook, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Facebook, MapPin } from "lucide-react";
 
 import bannerImage from "@/assets/contact-banner.jpg";
-import { products } from "@/data/products";
+import { getProductBySlug, products } from "@/data/products";
 import { FACEBOOK_URL } from "@/components/site-footer";
 
 const title = "Contact — Natural State Peptides";
@@ -11,6 +11,20 @@ const description =
   "Contact Natural State Peptides with product inquiries, testing documentation requests, partnership questions, or general questions.";
 
 export const Route = createFileRoute("/contact")({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { product?: string | undefined; intent?: "coa" | "product" | "partnership" | undefined } => ({
+    product:
+      typeof search["product"] === "string" && getProductBySlug(search["product"])
+        ? search["product"]
+        : undefined,
+    intent:
+      search["intent"] === "coa" ||
+      search["intent"] === "product" ||
+      search["intent"] === "partnership"
+        ? search["intent"]
+        : undefined,
+  }),
   head: () => ({
     meta: [
       { title },
@@ -25,7 +39,7 @@ export const Route = createFileRoute("/contact")({
 const faqs = [
   {
     q: "Where can I find product testing information?",
-    a: "Testing documentation is linked from each product page and is also available on request.",
+    a: "Use Request COA on a product page to prepare a documentation inquiry. Reports are shared upon request, where available; ask about the report source and applicable lot.",
   },
   {
     q: "How quickly do you respond?",
@@ -33,51 +47,57 @@ const faqs = [
   },
   {
     q: "Can I inquire about partnerships or ambassador opportunities?",
-    a: "Yes. Use the form and select a relevant subject, or mention partnerships or ambassador interest in your message.",
+    a: "Yes. Choose Partnership inquiry below and tell us about your interest before sending your message on Facebook.",
   },
 ];
 
-type Errors = Partial<Record<"name" | "email" | "subject" | "message", string>>;
-
 function ContactPage() {
-  const [values, setValues] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    product: "",
-    message: "",
-  });
-  const [errors, setErrors] = useState<Errors>({});
-  const [status, setStatus] = useState<"idle" | "success">("idle");
+  const search = Route.useSearch();
+  const [productSlug, setProductSlug] = useState(search.product ?? "");
+  const [intent, setIntent] = useState(search.intent ?? "product");
+  const [lot, setLot] = useState("");
+  const [notes, setNotes] = useState("");
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
-  const set = (key: keyof typeof values) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setValues((v) => ({ ...v, [key]: e.target.value }));
+  useEffect(() => {
+    setProductSlug(search.product ?? "");
+    setIntent(search.intent ?? "product");
+    setLot("");
+    setCopyStatus("idle");
+  }, [search.product, search.intent]);
+
+  const product = getProductBySlug(productSlug);
+  const topic =
+    intent === "coa"
+      ? "COA request"
+      : intent === "partnership"
+        ? "Partnership inquiry"
+        : "Product inquiry";
+  const draft = [
+    `Hello Natural State Peptides — ${topic.toLowerCase()}.`,
+    product ? `Product: ${product.name} (${product.strength})` : "",
+    lot.trim() ? `Lot reference: ${lot.trim()}` : "",
+    intent === "coa"
+      ? "Please share any available documentation and confirm the report source, laboratory, and applicable lot."
+      : intent === "partnership"
+        ? "I'd like to learn more about partnership opportunities."
+        : "Please let me know about current availability and product information.",
+    notes.trim(),
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  async function copyInquiry() {
+    try {
+      await navigator.clipboard.writeText(draft);
+      setCopyStatus("copied");
+    } catch {
+      setCopyStatus("failed");
+    }
+  }
 
   const fieldClass =
-    "w-full rounded-md border border-border bg-card px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-accent focus:ring-1 focus:ring-accent";
-  const labelClass = "block text-sm text-primary";
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const next: Errors = {};
-    if (!values.name.trim()) next.name = "Please enter your name.";
-    else if (values.name.length > 100) next.name = "Name must be under 100 characters.";
-    if (!values.email.trim()) next.email = "Please enter your email.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim()))
-      next.email = "Please enter a valid email address.";
-    if (!values.subject.trim()) next.subject = "Please enter a subject.";
-    if (!values.message.trim()) next.message = "Please enter a message.";
-    else if (values.message.length > 2000) next.message = "Message must be under 2000 characters.";
-
-    setErrors(next);
-    if (Object.keys(next).length > 0) {
-      setStatus("idle");
-      return;
-    }
-
-    setStatus("success");
-    setValues({ name: "", email: "", subject: "", product: "", message: "" });
-  }
+    "mt-2 w-full rounded-md border border-border bg-card px-4 py-3 text-base text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent";
 
   return (
     <>
@@ -94,8 +114,8 @@ function ContactPage() {
           <p className="eyebrow">Natural State Peptides</p>
           <h1 className="mt-5 font-serif text-5xl text-primary sm:text-6xl">Get in Touch</h1>
           <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-foreground/75">
-            Questions, product inquiries, partnerships, or testing documentation? We'd be happy
-            to hear from you.
+            Questions, product inquiries, partnerships, or testing documentation? We'd be happy to
+            hear from you.
           </p>
         </div>
       </section>
@@ -122,13 +142,6 @@ function ContactPage() {
                 <p className="text-sm text-muted-foreground">Arkansas, USA</p>
               </div>
             </li>
-            <li className="flex gap-4">
-              <Clock className="mt-1 size-4 shrink-0 text-accent" strokeWidth={1.4} />
-              <div>
-                <p className="text-sm font-medium text-primary">Email & phone</p>
-                <p className="text-sm text-muted-foreground">Coming soon</p>
-              </div>
-            </li>
           </ul>
 
           <a
@@ -149,109 +162,103 @@ function ContactPage() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-7 shadow-soft sm:p-9">
-          {status === "success" && (
-            <div
-              role="status"
-              className="mb-7 rounded-md border border-accent/40 bg-secondary/60 px-5 py-4 text-sm text-primary"
-            >
-              Thank you — your message has been received. We'll be in touch shortly.
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} noValidate className="grid gap-5">
-            <div>
-              <label htmlFor="name" className={labelClass}>
-                Name
-              </label>
-              <input
-                id="name"
-                value={values.name}
-                onChange={set("name")}
-                maxLength={100}
-                className={`${fieldClass} mt-2`}
-                aria-invalid={!!errors.name}
-              />
-              {errors.name && <p className="mt-2 text-xs text-destructive">{errors.name}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="email" className={labelClass}>
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={values.email}
-                onChange={set("email")}
-                maxLength={255}
-                className={`${fieldClass} mt-2`}
-                aria-invalid={!!errors.email}
-              />
-              {errors.email && <p className="mt-2 text-xs text-destructive">{errors.email}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="subject" className={labelClass}>
-                Subject
-              </label>
-              <input
-                id="subject"
-                value={values.subject}
-                onChange={set("subject")}
-                maxLength={150}
-                className={`${fieldClass} mt-2`}
-                aria-invalid={!!errors.subject}
-              />
-              {errors.subject && (
-                <p className="mt-2 text-xs text-destructive">{errors.subject}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="product" className={labelClass}>
-                Product of Interest <span className="text-muted-foreground">(optional)</span>
-              </label>
+        <div className="min-w-0 rounded-lg border border-border bg-card p-7 shadow-soft sm:p-9">
+          <p className="eyebrow">Prepare your inquiry</p>
+          <h2 className="mt-3 font-serif text-3xl text-primary">A clear starting point</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Choose your topic, copy the message, then paste and send it through our Facebook page.
+            Nothing is sent from this page.
+          </p>
+          <div className="mt-7 grid gap-5" onChange={() => setCopyStatus("idle")}>
+            <label htmlFor="inquiry-topic" className="text-sm text-primary">
+              Inquiry type
+              <select
+                id="inquiry-topic"
+                value={intent}
+                onChange={(e) => setIntent(e.target.value as typeof intent)}
+                className={fieldClass}
+              >
+                <option value="product">Product inquiry</option>
+                <option value="coa">COA request</option>
+                <option value="partnership">Partnership inquiry</option>
+              </select>
+            </label>
+            <label htmlFor="product" className="text-sm text-primary">
+              Product of interest (optional)
               <select
                 id="product"
-                value={values.product}
-                onChange={set("product")}
-                className={`${fieldClass} mt-2`}
+                value={productSlug}
+                onChange={(e) => {
+                  setProductSlug(e.target.value);
+                  setLot("");
+                }}
+                className={fieldClass}
               >
                 <option value="">Select a product</option>
                 {products.map((p) => (
-                  <option key={p.id} value={p.name}>
-                    {p.name}
+                  <option key={p.id} value={p.slug}>
+                    {p.name} — {p.strength}
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label htmlFor="message" className={labelClass}>
-                Message
+            </label>
+            {intent === "coa" && (
+              <label htmlFor="lot" className="text-sm text-primary">
+                Lot reference (if available)
+                <input
+                  id="lot"
+                  value={lot}
+                  onChange={(e) => setLot(e.target.value)}
+                  maxLength={100}
+                  className={fieldClass}
+                />
               </label>
+            )}
+            <label htmlFor="notes" className="text-sm text-primary">
+              Your questions (optional)
               <textarea
-                id="message"
-                rows={6}
-                value={values.message}
-                onChange={set("message")}
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
                 maxLength={2000}
-                className={`${fieldClass} mt-2 resize-y`}
-                aria-invalid={!!errors.message}
+                className={fieldClass}
               />
-              {errors.message && (
-                <p className="mt-2 text-xs text-destructive">{errors.message}</p>
-              )}
-            </div>
-
+            </label>
+            <label htmlFor="inquiry-draft" className="text-sm text-primary">
+              Your message
+              <textarea
+                id="inquiry-draft"
+                readOnly
+                value={draft}
+                rows={9}
+                className={`${fieldClass} bg-secondary/30`}
+                onFocus={(e) => e.target.select()}
+              />
+            </label>
             <button
-              type="submit"
-              className="mt-1 rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
+              type="button"
+              onClick={copyInquiry}
+              className="rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground hover:opacity-90"
             >
-              Send Message
+              {copyStatus === "copied" ? "Copied — ready to paste" : "1. Copy inquiry"}
             </button>
-          </form>
+            <a
+              href={FACEBOOK_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="rounded-md border border-primary/25 px-7 py-3.5 text-center text-sm text-primary hover:border-accent"
+            >
+              2. Open Facebook to send
+            </a>
+            <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
+              {copyStatus === "copied"
+                ? "Copied, not sent. Open our Facebook page, choose Message, then paste and send your inquiry."
+                : copyStatus === "failed"
+                  ? "Automatic copying is unavailable. Select and copy the message above, then paste it into a Facebook message."
+                  : "Facebook opens in a new tab. You may need to sign in to send a message."}
+            </p>
+          </div>
         </div>
       </section>
 
@@ -265,9 +272,7 @@ function ContactPage() {
                 <summary className="cursor-pointer list-none text-base text-primary marker:hidden">
                   <span className="flex items-start justify-between gap-4">
                     {f.q}
-                    <span className="text-accent transition-transform group-open:rotate-45">
-                      +
-                    </span>
+                    <span className="text-accent transition-transform group-open:rotate-45">+</span>
                   </span>
                 </summary>
                 <p className="mt-3 text-sm leading-relaxed text-foreground/75">{f.a}</p>

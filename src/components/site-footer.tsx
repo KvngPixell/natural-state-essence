@@ -21,8 +21,8 @@ export function SiteFooter() {
           <p className="font-serif text-2xl">Natural State Peptides</p>
           <div className="rule-gold mt-4" />
           <p className="mt-5 max-w-sm text-sm leading-relaxed text-primary-foreground/75">
-            An Arkansas-based research supplier focused on transparent testing, consistent
-            standards, and accessible documentation for research professionals.
+            An Arkansas-based research supplier. Explore our catalog and contact us for
+            product information and available documentation.
           </p>
           <p className="mt-6 font-serif text-lg text-accent">Keep it natural.</p>
         </div>

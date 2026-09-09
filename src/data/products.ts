@@ -13,14 +13,14 @@ export interface Product {
   shortDescription: string;
   longDescription: string;
   image: string;
-  coaUrl: string;
   testingStatus: string;
   storage: string;
   featured: boolean;
   sortOrder: number;
 }
 
-const TESTING_STATUS = "Third-party testing documentation available on request.";
+const TESTING_STATUS =
+  "Contact us to request available product documentation. Ask us to confirm the report source and whether it matches your product and lot. Documentation availability varies by product.";
 
 const STORAGE =
   "Store lyophilised material refrigerated at 2–8°C. Protect from light and moisture. Handle according to standard laboratory practice.";
@@ -192,7 +192,6 @@ export const products: Product[] = seeds.map((s, i) => ({
   shortDescription: s.shortDescription,
   longDescription: `${s.name} is supplied as a lyophilised research material for laboratory research use only. ${s.shortDescription} It is not supplied for human or animal use, and no dosing or handling guidance beyond standard laboratory practice is provided.`,
   image: vialImage,
-  coaUrl: "#",
   testingStatus: TESTING_STATUS,
   storage: STORAGE,
   featured: s.featured ?? false,

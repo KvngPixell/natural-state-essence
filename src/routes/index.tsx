@@ -3,7 +3,7 @@ import { CatalogPage } from "@/components/catalog-page";
 
 const title = "Natural State Peptides — Research Peptide Catalog";
 const description =
-  "Explore high-purity research compounds from Natural State Peptides, an Arkansas research supplier focused on transparent third-party testing and documentation.";
+  "Explore research compounds from Natural State Peptides. Check product availability and request available testing documentation.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
