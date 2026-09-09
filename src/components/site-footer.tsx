@@ -1,8 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Send, Twitter } from "lucide-react";
+import { Facebook } from "lucide-react";
+
+/** Official Natural State Peptides Facebook page. */
+export const FACEBOOK_URL = "https://www.facebook.com/naturalstatepeptides";
 
 const links = [
-  { to: "/catalogue", label: "Catalogue" },
+  { to: "/catalog", label: "Catalog" },
   { to: "/quality", label: "Quality & Testing" },
   { to: "/ambassador", label: "Ambassador" },
   { to: "/contact", label: "Contact" },
@@ -43,18 +46,18 @@ export function SiteFooter() {
         <div>
           <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Connect</p>
           <div className="mt-5 flex gap-3">
-            {[Instagram, Twitter, Send].map((Icon, i) => (
-              <span
-                key={i}
-                aria-hidden
-                className="grid size-10 place-items-center rounded-md border border-primary-foreground/20 text-primary-foreground/70"
-              >
-                <Icon className="size-4" />
-              </span>
-            ))}
+            <a
+              href={FACEBOOK_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="Natural State Peptides on Facebook"
+              className="grid size-10 place-items-center rounded-md border border-primary-foreground/20 text-primary-foreground/70 transition-colors hover:border-accent hover:text-accent"
+            >
+              <Facebook className="size-4" />
+            </a>
           </div>
           <p className="mt-5 text-sm text-primary-foreground/60">
-            Social links coming soon (placeholder).
+            Follow along for catalog and testing updates.
           </p>
         </div>
       </div>

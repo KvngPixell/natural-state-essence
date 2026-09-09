@@ -4,6 +4,7 @@ import { BadgeCheck, FileText, FlaskConical, Leaf } from "lucide-react";
 import { getProductBySlug, products, RESEARCH_DISCLAIMER } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 import { ContactCta } from "@/components/contact-cta";
+import { ProductVial } from "@/components/product-vial";
 
 const badges = [
   { icon: FlaskConical, label: "Research Use Only" },
@@ -46,7 +47,7 @@ function ProductDetail() {
     { title: "Product Overview", body: product.longDescription },
     {
       title: "Research Information",
-      body: "Research information for this compound is listed as a placeholder. Verified references and handling notes will be published here as documentation becomes available.",
+      body: "Research information for this compound is published as it is verified. Handling notes and references are added here as documentation is finalised.",
     },
     { title: "Testing & Documentation", body: product.testingStatus },
     { title: "Storage Information", body: product.storage },
@@ -57,21 +58,15 @@ function ProductDetail() {
       <section className="border-b border-border bg-secondary/30">
         <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
           <Link
-            to="/catalogue"
+            to="/catalog"
             className="text-sm text-muted-foreground transition-colors hover:text-accent"
           >
-            ← Back to catalogue
+            ← Back to catalog
           </Link>
 
           <div className="mt-8 grid gap-12 pb-16 lg:grid-cols-2 lg:items-start">
             <div className="overflow-hidden rounded-lg border border-border bg-card shadow-soft">
-              <img
-                src={product.image}
-                alt={`${product.name} research vial (placeholder image)`}
-                width={1024}
-                height={1024}
-                className="aspect-square w-full object-cover"
-              />
+              <ProductVial product={product} eager />
             </div>
 
             <div>
@@ -103,7 +98,7 @@ function ProductDetail() {
                 View COA
               </a>
               <p className="mt-3 text-xs text-muted-foreground">
-                COA link placeholder — documentation to be added.
+                Certificate of analysis available on request.
               </p>
             </div>
           </div>

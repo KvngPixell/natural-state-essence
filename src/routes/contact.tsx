@@ -4,6 +4,7 @@ import { Clock, Mail, MapPin } from "lucide-react";
 
 import bannerImage from "@/assets/contact-banner.jpg";
 import { products } from "@/data/products";
+import { FACEBOOK_URL } from "@/components/site-footer";
 
 const title = "Contact — Natural State Peptides";
 const description =
@@ -24,11 +25,11 @@ export const Route = createFileRoute("/contact")({
 const faqs = [
   {
     q: "Where can I find product testing information?",
-    a: "Testing documentation is linked from each product page as it becomes available. Where a document has not yet been published, the link is shown as a placeholder.",
+    a: "Testing documentation is linked from each product page and is also available on request.",
   },
   {
     q: "How quickly do you respond?",
-    a: "Typical response time is 24–48 hours (placeholder). Including the product name in your message helps us respond more efficiently.",
+    a: "Including the product name in your message helps us respond more efficiently.",
   },
   {
     q: "Can I inquire about partnerships or ambassador opportunities?",
@@ -110,7 +111,7 @@ function ContactPage() {
               <div className="min-w-0">
                 <p className="text-sm font-medium text-primary">Email</p>
                 <p className="text-sm break-words text-muted-foreground">
-                  hello@example.com (placeholder)
+                  Email address to be added
                 </p>
               </div>
             </li>
@@ -126,14 +127,23 @@ function ContactPage() {
               <div>
                 <p className="text-sm font-medium text-primary">Response time</p>
                 <p className="text-sm text-muted-foreground">
-                  Typically 24–48 hours (placeholder)
+                  To be confirmed
                 </p>
               </div>
             </li>
           </ul>
 
           <p className="mt-8 text-sm text-muted-foreground">
-            Social links: placeholder — Instagram, X, Telegram.
+            Follow us on{" "}
+            <a
+              href={FACEBOOK_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="border-b border-accent/60 text-primary transition-colors hover:text-accent"
+            >
+              Facebook
+            </a>
+            .
           </p>
 
           <div className="mt-8 rounded-lg border border-border bg-secondary/50 p-6">

@@ -37,7 +37,7 @@ const qualityPoints = [
   "Quality-Focused Standards",
 ];
 
-export function CataloguePage() {
+export function CatalogPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("All Products");
   const [sort, setSort] = useState("default");
@@ -91,10 +91,10 @@ export function CataloguePage() {
           </p>
           <div className="fade-up mt-10 flex flex-col justify-center gap-3 sm:flex-row">
             <a
-              href="#catalogue"
+              href="#catalog"
               className="rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
             >
-              Browse Catalogue
+              Browse Catalog
             </a>
             <Link
               to="/contact"
@@ -121,9 +121,9 @@ export function CataloguePage() {
         </div>
       </section>
 
-      {/* Catalogue */}
-      <section id="catalogue" className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
-        <p className="eyebrow">Current Catalogue</p>
+      {/* Catalog */}
+      <section id="catalog" className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
+        <p className="eyebrow">Current Catalog</p>
         <h2 className="mt-4 font-serif text-4xl text-primary sm:text-5xl">
           Explore the Collection
         </h2>

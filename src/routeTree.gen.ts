@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AmbassadorRouteImport } from './routes/ambassador'
-import { Route as CatalogueRouteImport } from './routes/catalogue'
+import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as QualityRouteImport } from './routes/quality'
@@ -28,9 +28,9 @@ const AmbassadorRoute = AmbassadorRouteImport.update({
   path: '/ambassador',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CatalogueRoute = CatalogueRouteImport.update({
-  id: '/catalogue',
-  path: '/catalogue',
+const CatalogRoute = CatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -62,7 +62,7 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ambassador': typeof AmbassadorRoute
-  '/catalogue': typeof CatalogueRoute
+  '/catalog': typeof CatalogRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
@@ -72,7 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ambassador': typeof AmbassadorRoute
-  '/catalogue': typeof CatalogueRoute
+  '/catalog': typeof CatalogRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
@@ -83,7 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ambassador': typeof AmbassadorRoute
-  '/catalogue': typeof CatalogueRoute
+  '/catalog': typeof CatalogRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
@@ -95,7 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ambassador'
-    | '/catalogue'
+    | '/catalog'
     | '/contact'
     | '/privacy'
     | '/quality'
@@ -105,7 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ambassador'
-    | '/catalogue'
+    | '/catalog'
     | '/contact'
     | '/privacy'
     | '/quality'
@@ -115,7 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/ambassador'
-    | '/catalogue'
+    | '/catalog'
     | '/contact'
     | '/privacy'
     | '/quality'
@@ -126,7 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AmbassadorRoute: typeof AmbassadorRoute
-  CatalogueRoute: typeof CatalogueRoute
+  CatalogRoute: typeof CatalogRoute
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
   QualityRoute: typeof QualityRoute
@@ -150,11 +150,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AmbassadorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/catalogue': {
-      id: '/catalogue'
-      path: '/catalogue'
-      fullPath: '/catalogue'
-      preLoaderRoute: typeof CatalogueRouteImport
+    '/catalog': {
+      id: '/catalog'
+      path: '/catalog'
+      fullPath: '/catalog'
+      preLoaderRoute: typeof CatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -198,7 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AmbassadorRoute: AmbassadorRoute,
-  CatalogueRoute: CatalogueRoute,
+  CatalogRoute: CatalogRoute,
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
   QualityRoute: QualityRoute,
