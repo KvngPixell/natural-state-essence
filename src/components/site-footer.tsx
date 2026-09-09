@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Instagram, Send, Twitter } from "lucide-react";
 
 const links = [
-  { to: "/catalogue", label: "Catalogue" },
+  { to: "/catalog", label: "Catalog" },
   { to: "/quality", label: "Quality & Testing" },
   { to: "/ambassador", label: "Ambassador" },
   { to: "/contact", label: "Contact" },

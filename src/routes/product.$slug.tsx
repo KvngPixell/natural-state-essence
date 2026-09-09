@@ -57,10 +57,10 @@ function ProductDetail() {
       <section className="border-b border-border bg-secondary/30">
         <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
           <Link
-            to="/catalogue"
+            to="/catalog"
             className="text-sm text-muted-foreground transition-colors hover:text-accent"
           >
-            ← Back to catalogue
+            ← Back to catalog
           </Link>
 
           <div className="mt-8 grid gap-12 pb-16 lg:grid-cols-2 lg:items-start">

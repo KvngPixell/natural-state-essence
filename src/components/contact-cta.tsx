@@ -6,7 +6,7 @@ export function ContactCta() {
       <div className="mx-auto max-w-3xl px-5 py-24 text-center sm:px-8">
         <div className="rule-gold mx-auto" />
         <h2 className="mt-8 font-serif text-4xl text-primary-foreground sm:text-5xl">
-          Questions about our catalogue?
+          Questions about our catalog?
         </h2>
         <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-primary-foreground/75">
           Contact Natural State Peptides for product information, testing documentation,
