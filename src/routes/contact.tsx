@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Clock, Mail, MapPin } from "lucide-react";
+import { Clock, Facebook, MapPin } from "lucide-react";
 
 import bannerImage from "@/assets/contact-banner.jpg";
 import { products } from "@/data/products";
