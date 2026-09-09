@@ -1,6 +1,7 @@
 import vialImage from "@/assets/vial-nsp.jpg";
 
 export type ProductCategory = "Peptides" | "Blends" | "Research Compounds";
+export type ProductStatus = "In Stock" | "Coming Soon";
 
 export interface Product {
   id: string;
@@ -8,6 +9,7 @@ export interface Product {
   slug: string;
   strength: string;
   category: ProductCategory;
+  status: ProductStatus;
   shortDescription: string;
   longDescription: string;
   image: string;
@@ -28,8 +30,8 @@ interface Seed {
   slug: string;
   strength: string;
   category: ProductCategory;
+  status: ProductStatus;
   shortDescription: string;
-  longDescription: string;
   featured?: boolean;
 }
 
@@ -39,10 +41,19 @@ const seeds: Seed[] = [
     slug: "retatrutide",
     strength: "20 mg",
     category: "Research Compounds",
+    status: "In Stock",
     shortDescription:
-      "A research compound supplied as a lyophilised powder for controlled laboratory settings.",
-    longDescription:
-      "Retatrutide is supplied strictly as a research compound in lyophilised form. It is intended for laboratory research use only and is not supplied for human or animal use. Additional characterisation details will be published here as documentation is finalised.",
+      "Multi-receptor research peptide studied for metabolic signaling, appetite-regulation pathways, energy balance, and glucose-related physiology.",
+    featured: true,
+  },
+  {
+    name: "Epitalon",
+    slug: "epitalon",
+    strength: "10 mg",
+    category: "Peptides",
+    status: "In Stock",
+    shortDescription:
+      "Short synthetic peptide studied in research involving cellular aging, circadian signaling, telomere-related mechanisms, and longevity pathways.",
     featured: true,
   },
   {
@@ -50,83 +61,9 @@ const seeds: Seed[] = [
     slug: "cjc-1295-no-dac-ipamorelin",
     strength: "10 mg",
     category: "Blends",
+    status: "In Stock",
     shortDescription:
-      "A blended research preparation combining two peptides in a single lyophilised vial.",
-    longDescription:
-      "This blended preparation combines CJC-1295 (No DAC) and Ipamorelin in a single lyophilised vial for laboratory research applications. Blend ratio documentation will be published here once finalised.",
-    featured: true,
-  },
-  {
-    name: "Oxytocin",
-    slug: "oxytocin",
-    strength: "10 mg",
-    category: "Peptides",
-    shortDescription:
-      "A research peptide supplied in lyophilised form for laboratory research applications.",
-    longDescription:
-      "Oxytocin is supplied as a lyophilised powder for laboratory research use only. Handling and characterisation notes will be added here as documentation becomes available.",
-  },
-  {
-    name: "Semax",
-    slug: "semax",
-    strength: "10 mg",
-    category: "Peptides",
-    shortDescription:
-      "A research peptide supplied in lyophilised form for laboratory research applications.",
-    longDescription:
-      "Semax is supplied as a lyophilised powder for laboratory research use only. Additional product documentation will be published here as it is finalised.",
-  },
-  {
-    name: "PT-141",
-    slug: "pt-141",
-    strength: "10 mg",
-    category: "Peptides",
-    shortDescription:
-      "A research peptide supplied in lyophilised form for laboratory research applications.",
-    longDescription:
-      "PT-141 is supplied as a lyophilised powder for laboratory research use only. Further characterisation details will be added here as documentation becomes available.",
-  },
-  {
-    name: "KLOW",
-    slug: "klow",
-    strength: "80 mg",
-    category: "Blends",
-    shortDescription:
-      "A multi-peptide blended research preparation supplied in a single lyophilised vial.",
-    longDescription:
-      "KLOW is a multi-peptide blended preparation supplied in lyophilised form for laboratory research use only. Component and ratio documentation will be published here once finalised.",
-    featured: true,
-  },
-  {
-    name: "GLOW",
-    slug: "glow",
-    strength: "70 mg",
-    category: "Blends",
-    shortDescription:
-      "A multi-peptide blended research preparation supplied in a single lyophilised vial.",
-    longDescription:
-      "GLOW is a multi-peptide blended preparation supplied in lyophilised form for laboratory research use only. Component and ratio documentation will be published here once finalised.",
-    featured: true,
-  },
-  {
-    name: "GHK-Cu",
-    slug: "ghk-cu",
-    strength: "100 mg",
-    category: "Peptides",
-    shortDescription:
-      "A copper-peptide research compound supplied in lyophilised form for laboratory use.",
-    longDescription:
-      "GHK-Cu is supplied as a lyophilised copper peptide for laboratory research use only. Additional documentation will be published here as it is finalised.",
-  },
-  {
-    name: "BPC-157 + TB-500",
-    slug: "bpc-157-tb-500",
-    strength: "10 mg",
-    category: "Blends",
-    shortDescription:
-      "A blended research preparation combining two peptides in a single lyophilised vial.",
-    longDescription:
-      "This blended preparation combines BPC-157 and TB-500 in a single lyophilised vial for laboratory research applications. Blend ratio documentation will be published here once finalised.",
+      "Peptide blend studied for growth-hormone signaling, recovery pathways, body-composition research, and sleep-related physiology.",
     featured: true,
   },
   {
@@ -134,52 +71,110 @@ const seeds: Seed[] = [
     slug: "pinealon",
     strength: "10 mg",
     category: "Peptides",
+    status: "In Stock",
     shortDescription:
-      "A short-chain research peptide supplied in lyophilised form for laboratory applications.",
-    longDescription:
-      "Pinealon is supplied as a lyophilised powder for laboratory research use only. Additional documentation will be added here as it becomes available.",
-  },
-  {
-    name: "SS-31",
-    slug: "ss-31",
-    strength: "50 mg",
-    category: "Peptides",
-    shortDescription:
-      "A research peptide supplied in lyophilised form for laboratory research applications.",
-    longDescription:
-      "SS-31 is supplied as a lyophilised powder for laboratory research use only. Characterisation and handling documentation will be published here as it is finalised.",
+      "Short peptide studied in research involving neurological function, cognition, cellular aging, and neuroprotective signaling.",
     featured: true,
-  },
-  {
-    name: "Tesamorelin",
-    slug: "tesamorelin",
-    strength: "20 mg",
-    category: "Peptides",
-    shortDescription:
-      "A research peptide supplied in lyophilised form for laboratory research applications.",
-    longDescription:
-      "Tesamorelin is supplied as a lyophilised powder for laboratory research use only. Additional documentation will be published here as it becomes available.",
-  },
-  {
-    name: "Selank",
-    slug: "selank",
-    strength: "10 mg",
-    category: "Peptides",
-    shortDescription:
-      "A research peptide supplied in lyophilised form for laboratory research applications.",
-    longDescription:
-      "Selank is supplied as a lyophilised powder for laboratory research use only. Further product documentation will be added here as it is finalised.",
   },
   {
     name: "MOTS-C",
     slug: "mots-c",
     strength: "40 mg",
     category: "Peptides",
+    status: "In Stock",
     shortDescription:
-      "A research peptide supplied in lyophilised form for laboratory research applications.",
-    longDescription:
-      "MOTS-C is supplied as a lyophilised powder for laboratory research use only. Additional characterisation details will be published here as documentation becomes available.",
+      "Mitochondrial-derived peptide studied for metabolic signaling, glucose utilization, exercise physiology, and cellular energy regulation.",
     featured: true,
+  },
+  {
+    name: "Oxytocin",
+    slug: "oxytocin",
+    strength: "10 mg",
+    category: "Peptides",
+    status: "Coming Soon",
+    shortDescription:
+      "Naturally occurring peptide hormone researched for social-bonding pathways, stress response, mood-related signaling, and reproductive physiology.",
+  },
+  {
+    name: "Semax",
+    slug: "semax",
+    strength: "10 mg",
+    category: "Peptides",
+    status: "Coming Soon",
+    shortDescription:
+      "Synthetic peptide researched for neurological signaling, cognition, stress response, and neuroprotective pathways.",
+  },
+  {
+    name: "PT-141",
+    slug: "pt-141",
+    strength: "10 mg",
+    category: "Peptides",
+    status: "Coming Soon",
+    shortDescription:
+      "Melanocortin-receptor peptide studied for sexual-arousal pathways and central nervous system signaling.",
+  },
+  {
+    name: "KLOW",
+    slug: "klow",
+    strength: "80 mg",
+    category: "Blends",
+    status: "Coming Soon",
+    shortDescription:
+      "Four-peptide research blend containing GHK-Cu, BPC-157, TB-500, and KPV, studied across tissue-repair, matrix-remodeling, inflammatory-signaling, and recovery-related pathways.",
+  },
+  {
+    name: "GLOW",
+    slug: "glow",
+    strength: "70 mg",
+    category: "Blends",
+    status: "Coming Soon",
+    shortDescription:
+      "Research blend containing GHK-Cu, BPC-157, and TB-500, studied across tissue-repair, collagen-related, cellular-migration, and recovery pathways.",
+  },
+  {
+    name: "GHK-Cu",
+    slug: "ghk-cu",
+    strength: "100 mg",
+    category: "Peptides",
+    status: "Coming Soon",
+    shortDescription:
+      "Copper-binding peptide researched for tissue repair, collagen-related pathways, skin biology, hair biology, and wound-healing mechanisms.",
+  },
+  {
+    name: "BPC-157 + TB-500",
+    slug: "bpc-157-tb-500",
+    strength: "10 mg",
+    category: "Blends",
+    status: "Coming Soon",
+    shortDescription:
+      "Research blend investigated for tissue-repair pathways, inflammation signaling, vascular responses, and recovery mechanisms.",
+  },
+  {
+    name: "SS-31",
+    slug: "ss-31",
+    strength: "50 mg",
+    category: "Peptides",
+    status: "Coming Soon",
+    shortDescription:
+      "Mitochondria-targeting research peptide studied for cellular energy production, oxidative stress, and mitochondrial function.",
+  },
+  {
+    name: "Tesamorelin",
+    slug: "tesamorelin",
+    strength: "20 mg",
+    category: "Peptides",
+    status: "Coming Soon",
+    shortDescription:
+      "Growth-hormone-releasing hormone analogue studied for growth-hormone signaling, metabolism, and body-composition pathways.",
+  },
+  {
+    name: "Selank",
+    slug: "selank",
+    strength: "10 mg",
+    category: "Peptides",
+    status: "Coming Soon",
+    shortDescription:
+      "Synthetic peptide researched for anxiety-related signaling, cognition, stress response, and neurological function.",
   },
 ];
 
@@ -193,8 +188,9 @@ export const products: Product[] = seeds.map((s, i) => ({
   slug: s.slug,
   strength: s.strength,
   category: s.category,
+  status: s.status,
   shortDescription: s.shortDescription,
-  longDescription: s.longDescription,
+  longDescription: `${s.name} is supplied as a lyophilised research material for laboratory research use only. ${s.shortDescription} It is not supplied for human or animal use, and no dosing or handling guidance beyond standard laboratory practice is provided.`,
   image: vialImage,
   coaUrl: "#",
   testingStatus: TESTING_STATUS,
@@ -210,6 +206,8 @@ export const categoryFilters = [
   "Featured",
   "Research Compounds",
 ] as const;
+
+export const availabilityFilters = ["All", "In Stock", "Coming Soon"] as const;
 
 export function getProductBySlug(slug: string) {
   return products.find((p) => p.slug === slug);

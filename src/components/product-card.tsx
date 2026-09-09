@@ -1,15 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/data/products";
 import { ProductVial } from "@/components/product-vial";
+import { StatusBadge } from "@/components/status-badge";
 
 export function ProductCard({ product }: { product: Product }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
-      <div className="overflow-hidden bg-secondary/50">
+      <div className="relative overflow-hidden bg-secondary/50">
         <ProductVial
           product={product}
           className="transition-transform duration-500 group-hover:scale-[1.03]"
         />
+        <StatusBadge status={product.status} className="absolute top-3 left-3" />
       </div>
 
       <div className="flex flex-1 flex-col p-6">

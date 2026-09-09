@@ -5,6 +5,7 @@ import { getProductBySlug, products, RESEARCH_DISCLAIMER } from "@/data/products
 import { ProductCard } from "@/components/product-card";
 import { ContactCta } from "@/components/contact-cta";
 import { ProductVial } from "@/components/product-vial";
+import { StatusBadge } from "@/components/status-badge";
 
 const badges = [
   { icon: FlaskConical, label: "Research Use Only" },
@@ -70,7 +71,10 @@ function ProductDetail() {
             </div>
 
             <div>
-              <p className="eyebrow">{product.category}</p>
+              <div className="flex flex-wrap items-center gap-4">
+                <p className="eyebrow">{product.category}</p>
+                <StatusBadge status={product.status} />
+              </div>
               <h1 className="mt-4 font-serif text-5xl text-primary sm:text-6xl">
                 {product.name}
               </h1>

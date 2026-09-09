@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { BadgeCheck, FlaskConical, FileText, Leaf, Search } from "lucide-react";
 
 import heroImage from "@/assets/hero-arkansas.jpg";
-import { categoryFilters, products } from "@/data/products";
+import { availabilityFilters, categoryFilters, products } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 import { ContactCta } from "@/components/contact-cta";
 
@@ -41,6 +41,7 @@ export function CatalogPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("All Products");
   const [sort, setSort] = useState("default");
+  const [availability, setAvailability] = useState<string>("All");
 
   const visible = useMemo(() => {
     let list = products.filter((p) => {
@@ -53,7 +54,8 @@ export function CatalogPage() {
       const matchesCategory =
         category === "All Products" ||
         (category === "Featured" ? p.featured : p.category === category);
-      return matchesQuery && matchesCategory;
+      const matchesAvailability = availability === "All" || p.status === availability;
+      return matchesQuery && matchesCategory && matchesAvailability;
     });
 
     list = [...list].sort((a, b) => {
@@ -63,7 +65,7 @@ export function CatalogPage() {
     });
 
     return list;
-  }, [query, category, sort]);
+  }, [query, category, sort, availability]);
 
   const fieldClass =
     "w-full rounded-md border border-border bg-card px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-accent focus:ring-1 focus:ring-accent";
@@ -132,7 +134,7 @@ export function CatalogPage() {
           testing documentation.
         </p>
 
-        <div className="mt-12 grid gap-3 md:grid-cols-[1.6fr_1fr_1fr]">
+        <div className="mt-12 grid gap-3 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div className="relative">
             <Search className="absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground" />
             <label htmlFor="product-search" className="sr-only">
@@ -160,6 +162,23 @@ export function CatalogPage() {
               {categoryFilters.map((c) => (
                 <option key={c} value={c}>
                   {c}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="availability-filter" className="sr-only">
+              Filter by availability
+            </label>
+            <select
+              id="availability-filter"
+              value={availability}
+              onChange={(e) => setAvailability(e.target.value)}
+              className={fieldClass}
+            >
+              {availabilityFilters.map((a) => (
+                <option key={a} value={a}>
+                  {a === "All" ? "Availability: All" : a}
                 </option>
               ))}
             </select>
