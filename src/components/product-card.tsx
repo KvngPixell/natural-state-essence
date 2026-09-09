@@ -1,17 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/data/products";
+import { ProductVial } from "@/components/product-vial";
 
 export function ProductCard({ product }: { product: Product }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
       <div className="overflow-hidden bg-secondary/50">
-        <img
-          src={product.image}
-          alt={`${product.name} research vial (placeholder image)`}
-          loading="lazy"
-          width={1024}
-          height={1024}
-          className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        <ProductVial
+          product={product}
+          className="transition-transform duration-500 group-hover:scale-[1.03]"
         />
       </div>
 

@@ -28,17 +28,24 @@ export function ProductVial({
       />
       <div
         className="pointer-events-none absolute flex flex-col items-center justify-center text-center"
-        style={{ left: "35%", right: "35%", top: "51%", bottom: "27%" }}
+        style={{
+          left: "34%",
+          right: "34%",
+          top: "50%",
+          bottom: "26%",
+          containerType: "inline-size",
+        }}
       >
         <span
-          className={`font-serif leading-tight text-[#1f3d2b] ${
-            long ? "text-[clamp(0.5rem,2.1cqw,0.95rem)]" : "text-[clamp(0.7rem,3.4cqw,1.6rem)]"
-          }`}
-          style={{ containerType: "inline-size" }}
+          className="font-serif leading-tight break-words text-[#1f3d2b]"
+          style={{ fontSize: long ? "13cqw" : "20cqw" }}
         >
           {product.name}
         </span>
-        <span className="mt-[0.35em] font-serif text-[clamp(0.5rem,2cqw,0.95rem)] tracking-[0.12em] text-[#9a7b3f] uppercase">
+        <span
+          className="mt-[0.4em] font-serif tracking-[0.12em] text-[#9a7b3f] uppercase"
+          style={{ fontSize: "11cqw" }}
+        >
           {product.strength}
         </span>
       </div>
