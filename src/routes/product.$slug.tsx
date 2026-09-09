@@ -4,6 +4,7 @@ import { BadgeCheck, FileText, FlaskConical, Leaf } from "lucide-react";
 import { getProductBySlug, products, RESEARCH_DISCLAIMER } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 import { ContactCta } from "@/components/contact-cta";
+import { ProductVial } from "@/components/product-vial";
 
 const badges = [
   { icon: FlaskConical, label: "Research Use Only" },
@@ -65,13 +66,7 @@ function ProductDetail() {
 
           <div className="mt-8 grid gap-12 pb-16 lg:grid-cols-2 lg:items-start">
             <div className="overflow-hidden rounded-lg border border-border bg-card shadow-soft">
-              <img
-                src={product.image}
-                alt={`${product.name} research vial (placeholder image)`}
-                width={1024}
-                height={1024}
-                className="aspect-square w-full object-cover"
-              />
+              <ProductVial product={product} eager />
             </div>
 
             <div>
