@@ -4,6 +4,7 @@ import { Clock, Mail, MapPin } from "lucide-react";
 
 import bannerImage from "@/assets/contact-banner.jpg";
 import { products } from "@/data/products";
+import { FACEBOOK_URL } from "@/components/site-footer";
 
 const title = "Contact — Natural State Peptides";
 const description =
@@ -133,7 +134,16 @@ function ContactPage() {
           </ul>
 
           <p className="mt-8 text-sm text-muted-foreground">
-            Social links to be added.
+            Follow us on{" "}
+            <a
+              href={FACEBOOK_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="border-b border-accent/60 text-primary transition-colors hover:text-accent"
+            >
+              Facebook
+            </a>
+            .
           </p>
 
           <div className="mt-8 rounded-lg border border-border bg-secondary/50 p-6">
