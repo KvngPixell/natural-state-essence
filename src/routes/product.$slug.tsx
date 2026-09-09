@@ -47,7 +47,7 @@ function ProductDetail() {
     { title: "Product Overview", body: product.longDescription },
     {
       title: "Research Information",
-      body: "Research information for this compound is listed as a placeholder. Verified references and handling notes will be published here as documentation becomes available.",
+      body: "Research information for this compound is published as it is verified. Handling notes and references are added here as documentation is finalised.",
     },
     { title: "Testing & Documentation", body: product.testingStatus },
     { title: "Storage Information", body: product.storage },
@@ -98,7 +98,7 @@ function ProductDetail() {
                 View COA
               </a>
               <p className="mt-3 text-xs text-muted-foreground">
-                COA link placeholder — documentation to be added.
+                Certificate of analysis available on request.
               </p>
             </div>
           </div>
