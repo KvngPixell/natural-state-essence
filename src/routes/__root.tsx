@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
 import { PortalProvider } from "@/components/portal-context";
 import { SiteFooter } from "@/components/site-footer";
+import { ResearchBanner } from "@/components/research-banner";
 
 function NotFoundComponent() {
   return (
@@ -131,6 +132,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <PortalProvider><div className="flex min-h-screen flex-col">
+        <ResearchBanner />
         <SiteHeader />
         <main className="flex-1">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
