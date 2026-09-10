@@ -16,6 +16,10 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as QualityRouteImport } from './routes/quality'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as AdminPartnersRouteImport } from './routes/admin.partners'
+import { Route as PartnerDashboardRouteImport } from './routes/partner.dashboard'
+import { Route as PartnerLoginRouteImport } from './routes/partner.login'
+import { Route as PartnerResetRouteImport } from './routes/partner.reset'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +57,26 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPartnersRoute = AdminPartnersRouteImport.update({
+  id: '/admin/partners',
+  path: '/admin/partners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerDashboardRoute = PartnerDashboardRouteImport.update({
+  id: '/partner/dashboard',
+  path: '/partner/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerLoginRoute = PartnerLoginRouteImport.update({
+  id: '/partner/login',
+  path: '/partner/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerResetRoute = PartnerResetRouteImport.update({
+  id: '/partner/reset',
+  path: '/partner/reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
@@ -67,6 +91,10 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
   '/terms': typeof TermsRoute
+  '/admin/partners': typeof AdminPartnersRoute
+  '/partner/dashboard': typeof PartnerDashboardRoute
+  '/partner/login': typeof PartnerLoginRoute
+  '/partner/reset': typeof PartnerResetRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +105,10 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
   '/terms': typeof TermsRoute
+  '/admin/partners': typeof AdminPartnersRoute
+  '/partner/dashboard': typeof PartnerDashboardRoute
+  '/partner/login': typeof PartnerLoginRoute
+  '/partner/reset': typeof PartnerResetRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesById {
@@ -88,6 +120,10 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
   '/terms': typeof TermsRoute
+  '/admin/partners': typeof AdminPartnersRoute
+  '/partner/dashboard': typeof PartnerDashboardRoute
+  '/partner/login': typeof PartnerLoginRoute
+  '/partner/reset': typeof PartnerResetRoute
   '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +136,10 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/quality'
     | '/terms'
+    | '/admin/partners'
+    | '/partner/dashboard'
+    | '/partner/login'
+    | '/partner/reset'
     | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +150,10 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/quality'
     | '/terms'
+    | '/admin/partners'
+    | '/partner/dashboard'
+    | '/partner/login'
+    | '/partner/reset'
     | '/product/$slug'
   id:
     | '__root__'
@@ -120,6 +164,10 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/quality'
     | '/terms'
+    | '/admin/partners'
+    | '/partner/dashboard'
+    | '/partner/login'
+    | '/partner/reset'
     | '/product/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +179,10 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   QualityRoute: typeof QualityRoute
   TermsRoute: typeof TermsRoute
+  AdminPartnersRoute: typeof AdminPartnersRoute
+  PartnerDashboardRoute: typeof PartnerDashboardRoute
+  PartnerLoginRoute: typeof PartnerLoginRoute
+  PartnerResetRoute: typeof PartnerResetRoute
   ProductSlugRoute: typeof ProductSlugRoute
 }
 
@@ -185,6 +237,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/partners': {
+      id: '/admin/partners'
+      path: '/admin/partners'
+      fullPath: '/admin/partners'
+      preLoaderRoute: typeof AdminPartnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/dashboard': {
+      id: '/partner/dashboard'
+      path: '/partner/dashboard'
+      fullPath: '/partner/dashboard'
+      preLoaderRoute: typeof PartnerDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/login': {
+      id: '/partner/login'
+      path: '/partner/login'
+      fullPath: '/partner/login'
+      preLoaderRoute: typeof PartnerLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/reset': {
+      id: '/partner/reset'
+      path: '/partner/reset'
+      fullPath: '/partner/reset'
+      preLoaderRoute: typeof PartnerResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
@@ -203,6 +283,10 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   QualityRoute: QualityRoute,
   TermsRoute: TermsRoute,
+  AdminPartnersRoute: AdminPartnersRoute,
+  PartnerDashboardRoute: PartnerDashboardRoute,
+  PartnerLoginRoute: PartnerLoginRoute,
+  PartnerResetRoute: PartnerResetRoute,
   ProductSlugRoute: ProductSlugRoute,
 }
 export const routeTree = rootRouteImport

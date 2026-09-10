@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CatalogPage } from "@/components/catalog-page";
+import { HomePage } from "@/components/home-page";
 
 const title = "Natural State Peptides — Research Peptide Catalog";
 const description =
@@ -14,5 +14,5 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: description },
     ],
   }),
-  component: CatalogPage,
+  component: HomePage,
 });

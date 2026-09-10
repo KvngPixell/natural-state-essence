@@ -45,12 +45,14 @@ export function CatalogPage() {
 
   const visible = useMemo(() => {
     let list = products.filter((p) => {
-      const q = query.trim().toLowerCase();
+      const normalize = (v: string) => v.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const q = normalize(query);
+      const aliases = p.slug === "epitalon" ? "epithalon" : p.slug === "cjc-1295-no-dac-ipamorelin" ? "cjcipacjc1295ipamorelin" : "";
       const matchesQuery =
         !q ||
-        p.name.toLowerCase().includes(q) ||
-        p.shortDescription.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q);
+        normalize(p.name).includes(q) || (!!q && aliases.includes(q)) ||
+        normalize(p.shortDescription).includes(q) ||
+        normalize(p.category).includes(q);
       const matchesCategory =
         category === "All Products" ||
         (category === "Featured" ? p.featured : p.category === category);

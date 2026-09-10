@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 const navLinks = [
   { to: "/catalog", label: "Catalog" },
   { to: "/quality", label: "Quality & Testing" },
-  { to: "/ambassador", label: "Ambassador" },
+  { to: "/ambassador", label: "Partners" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
@@ -37,10 +37,10 @@ export function SiteHeader() {
             </Link>
           ))}
           <Link
-            to="/contact"
+            to="/partner/login"
             className="rounded-md bg-primary px-5 py-2.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
           >
-            Contact Us
+            Partner Login
           </Link>
         </nav>
 
@@ -69,11 +69,11 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link
-              to="/contact"
+              to="/partner/login"
               onClick={() => setOpen(false)}
               className="mt-4 mb-2 rounded-md bg-primary px-5 py-3 text-center text-sm text-primary-foreground"
             >
-              Contact Us
+              Partner Login
             </Link>
           </div>
         </nav>
