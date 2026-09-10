@@ -6,6 +6,7 @@ import { ProductCard } from "@/components/product-card";
 import { ContactCta } from "@/components/contact-cta";
 import { ProductVial } from "@/components/product-vial";
 import { StatusBadge } from "@/components/status-badge";
+import { ProductSchema } from "@/components/structured-data";
 
 const badges = [
   { icon: FlaskConical, label: "Research Use Only" },
@@ -57,6 +58,7 @@ function ProductDetail() {
 
   return (
     <>
+      <ProductSchema product={product} />
       <section className="border-b border-border bg-secondary/30">
         <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
           <Link

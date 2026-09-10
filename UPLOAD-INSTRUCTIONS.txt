@@ -1,0 +1,27 @@
+ROUND 2 UPLOAD — 7 files
+========================
+Same process that worked before:
+  GitHub repo -> Add file -> Upload files
+  -> drag in the "src" folder from this bundle
+  -> commit
+  -> Lovable rebuilds, then hit Publish
+
+Files in this bundle:
+  src/styles.css                          (MODIFIED - accessibility colour fix)
+  src/components/structured-data.tsx      (NEW - SEO schema)
+  src/components/home-page.tsx            (MODIFIED - expanded FAQ + schema)
+  src/components/portal-context.tsx       (MODIFIED - strips ?ref= from URL)
+  src/components/site-footer.tsx          (MODIFIED - gold pinned for dark bg)
+  src/routes/__root.tsx                   (MODIFIED - org schema)
+  src/routes/product.$slug.tsx            (MODIFIED - product schema)
+
+All 7 files were syntax-checked. They could NOT be build-tested, because this
+session has no access to the npm registry. If Lovable's build fails, send me the
+error and I'll fix it.
+
+After publishing, verify:
+  1. Section labels (the small gold uppercase text) look slightly darker/richer.
+  2. Homepage FAQ shows 8 questions instead of 4.
+  3. Visiting a link with ?ref=TEST drops the ?ref= from the address bar.
+  4. Paste a product page URL into Google's Rich Results Test - it should
+     detect Product and BreadcrumbList.

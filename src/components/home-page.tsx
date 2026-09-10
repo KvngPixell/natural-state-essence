@@ -4,28 +4,46 @@ import { products } from "@/data/products";
 import { ProductVial } from "@/components/product-vial";
 import { ProductCard } from "@/components/product-card";
 import { button, outline, panel } from "@/lib/backend";
+import { FaqSchema } from "@/components/structured-data";
 const faq = [
   [
     "How do I request a COA?",
-    "Choose Request COA on a product page. Include a lot reference if you have one. Documentation is shared upon request, where available.",
+    "Choose Request COA on a product page, or use the Quality & Testing page. Include the product, strength, and a lot reference if you have one. Documentation is shared upon request, where available.",
+  ],
+  [
+    "How do I place an order?",
+    "Send an inquiry through the contact page with the product and strength you need. A member of the team responds directly to arrange the next step. Orders are not processed automatically through this website.",
   ],
   [
     "Which products are available?",
-    "The current collection below shows products marked In Stock. The full catalog also includes Coming Soon products.",
+    "The current collection below shows products marked In Stock. The full catalog also includes Coming Soon products, which are listed so you can ask to be told when they arrive.",
+  ],
+  [
+    "What does Coming Soon mean?",
+    "The product is part of our catalog but is not currently available to supply. Send an availability inquiry and we will tell you what we know about timing.",
+  ],
+  [
+    "Can these products be used by people or animals?",
+    "No. Everything in this catalog is supplied for laboratory research use only. Nothing here is a drug, supplement, or cosmetic, and nothing is supplied for human or animal consumption, diagnosis, or treatment. We do not provide dosing or administration guidance of any kind.",
+  ],
+  [
+    "How should material be stored?",
+    "Lyophilised material should be kept refrigerated at 2–8°C, protected from light and moisture, and handled according to standard laboratory practice.",
   ],
   [
     "How do I contact the team?",
-    "Use the inquiry page for product information, availability or documentation questions. Facebook messaging is also available.",
+    "Use the inquiry page for product information, availability, or documentation questions. Facebook messaging is also available.",
   ],
   [
     "Can I become an ambassador?",
-    "Apply through our partner page. Approved partners receive account access and individual terms before commissions are approved.",
+    "Apply through our partner page. Approved partners receive account access and individual written terms before any commissions are approved.",
   ],
 ];
 export function HomePage() {
   const available = products.filter((p) => p.status === "In Stock");
   return (
     <>
+      <FaqSchema items={faq} />
       <section className="relative isolate overflow-hidden border-b border-border">
         <img
           src={hero}

@@ -15,6 +15,7 @@ import { SiteHeader } from "@/components/site-header";
 import { PortalProvider } from "@/components/portal-context";
 import { SiteFooter } from "@/components/site-footer";
 import { ResearchBanner } from "@/components/research-banner";
+import { OrganizationSchema } from "@/components/structured-data";
 
 function NotFoundComponent() {
   return (
@@ -132,6 +133,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <PortalProvider><div className="flex min-h-screen flex-col">
+        <OrganizationSchema />
         <ResearchBanner />
         <SiteHeader />
         <main className="flex-1">

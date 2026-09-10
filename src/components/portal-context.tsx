@@ -15,8 +15,21 @@ export function PortalProvider({ children }: { children: ReactNode }) {
   const [admin, setAdmin] = useState(false);
   const [referral, setReferral] = useState("");
   useEffect(() => {
-    const ref = new URLSearchParams(window.location.search).get("ref");
-    if (ref && /^[a-z0-9_-]{3,32}$/i.test(ref)) setReferral(ref.toUpperCase());
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref && /^[a-z0-9_-]{3,32}$/i.test(ref)) {
+      setReferral(ref.toUpperCase());
+      // Strip ?ref= from the address bar once captured: keeps the referral in
+      // memory for this session while preventing search engines from indexing
+      // a separate duplicate URL per ambassador code.
+      params.delete("ref");
+      const query = params.toString();
+      window.history.replaceState(
+        window.history.state,
+        "",
+        window.location.pathname + (query ? "?" + query : "") + window.location.hash,
+      );
+    }
     if (!db) {
       setLoading(false);
       return;

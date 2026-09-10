@@ -24,17 +24,17 @@ export function SiteFooter() {
             An Arkansas-based research supplier. Explore our catalog and contact us for
             product information and available documentation.
           </p>
-          <p className="mt-6 font-serif text-lg text-accent">Keep it natural.</p>
+          <p className="mt-6 font-serif text-lg text-[var(--gold)]">Keep it natural.</p>
         </div>
 
         <nav aria-label="Footer">
-          <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Explore</p>
+          <p className="text-[0.68rem] tracking-[0.22em] text-[var(--gold)] uppercase">Explore</p>
           <ul className="mt-5 space-y-3 text-sm">
             {links.map((l) => (
               <li key={l.to}>
                 <Link
                   to={l.to}
-                  className="text-primary-foreground/75 transition-colors hover:text-accent"
+                  className="text-primary-foreground/75 transition-colors hover:text-[var(--gold)]"
                 >
                   {l.label}
                 </Link>
@@ -44,14 +44,14 @@ export function SiteFooter() {
         </nav>
 
         <div>
-          <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Connect</p>
+          <p className="text-[0.68rem] tracking-[0.22em] text-[var(--gold)] uppercase">Connect</p>
           <div className="mt-5 flex gap-3">
             <a
               href={FACEBOOK_URL}
               target="_blank"
               rel="noreferrer noopener"
               aria-label="Natural State Peptides on Facebook"
-              className="grid size-10 place-items-center rounded-md border border-primary-foreground/20 text-primary-foreground/70 transition-colors hover:border-accent hover:text-accent"
+              className="grid size-10 place-items-center rounded-md border border-primary-foreground/20 text-primary-foreground/70 transition-colors hover:border-[var(--gold)] hover:text-[var(--gold)]"
             >
               <Facebook className="size-4" />
             </a>
