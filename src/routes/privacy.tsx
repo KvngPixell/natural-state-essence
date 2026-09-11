@@ -3,7 +3,7 @@ import { SimplePage } from "@/components/simple-page";
 
 const title = "Privacy Policy — Natural State Peptides";
 const description =
-  "How Natural State Peptides collects, uses, and protects information submitted through inquiries, COA requests, and the partner program.";
+  "How Natural State Peptides collects, uses, and protects information submitted through inquiries, COA requests, and the ambassador program.";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -22,27 +22,27 @@ const sections: [string, string[]][] = [
     "Information we collect",
     [
       "When you submit a product inquiry, COA request, availability request, or ambassador application, we collect the information you provide directly: your name, email address, message, the product and lot reference you ask about (if any), and a referral code (if any).",
-      "If you are an approved partner, we additionally store your account email, referral code, agreed commission terms, and the recorded sales, commissions, and payouts associated with your account.",
+      "If you are an approved ambassador, we additionally store your account email, referral code, agreed commission terms, and the recorded sales, commissions, and payouts associated with your account.",
       "We do not collect payment card details through this site, and this site does not process checkout or payment.",
     ],
   ],
   [
     "How we use information",
     [
-      "We use the information you submit to respond to your inquiry, evaluate ambassador applications, administer approved partner accounts, and maintain records required to operate the ambassador program. We do not sell your information to third parties.",
+      "We use the information you submit to respond to your inquiry, evaluate ambassador applications, administer approved ambassador accounts, and maintain records required to operate the ambassador program. We do not sell your information to third parties.",
       "Submitting an inquiry does not sign you up for marketing communications.",
     ],
   ],
   [
     "Service providers",
     [
-      "We use Supabase to store submitted requests and to manage partner account authentication, and we use Resend to deliver email notifications of new inquiries to our team. These providers process data on our behalf and are bound by their own security and privacy practices.",
+      "We use Supabase to store submitted requests and to manage ambassador account authentication, and we use Resend to deliver email notifications of new inquiries to our team. These providers process data on our behalf and are bound by their own security and privacy practices.",
     ],
   ],
   [
     "Data retention",
     [
-      "We retain inquiry and partner records for as long as reasonably necessary to respond to requests, operate the ambassador program, and meet recordkeeping and legal obligations, after which records may be deleted or anonymized.",
+      "We retain inquiry and ambassador records for as long as reasonably necessary to respond to requests, operate the ambassador program, and meet recordkeeping and legal obligations, after which records may be deleted or anonymized.",
     ],
   ],
   [
@@ -66,7 +66,7 @@ const sections: [string, string[]][] = [
   [
     "Security",
     [
-      "Submitted requests and partner account data are stored with access controls that restrict who can read them, and administrative actions are logged. No method of transmission or storage is completely secure, and we cannot guarantee absolute security.",
+      "Submitted requests and ambassador account data are stored with access controls that restrict who can read them, and administrative actions are logged. No method of transmission or storage is completely secure, and we cannot guarantee absolute security.",
     ],
   ],
   [

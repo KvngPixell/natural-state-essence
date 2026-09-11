@@ -44,7 +44,7 @@ const faq = [
   ],
   [
     "Can I become an ambassador?",
-    "Apply through our partner page. Approved partners receive account access and individual written terms before any commissions are approved.",
+    "Apply through our ambassador page. Approved ambassadors receive account access and individual written terms before any commissions are approved.",
   ],
 ];
 export function HomePage() {
@@ -218,14 +218,14 @@ export function HomePage() {
       <section className="bg-primary text-primary-foreground">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6 px-5 py-12 sm:px-8">
           <div>
-            <p className="text-xs tracking-[.2em] uppercase opacity-70">Natural State Partners</p>
+            <p className="text-xs tracking-[.2em] uppercase opacity-70">Natural State Ambassadors</p>
             <h2 className="mt-3 font-serif text-4xl">Represent something distinctive.</h2>
           </div>
           <Link
             to="/ambassador"
             className="rounded-lg border border-primary-foreground/40 px-6 py-3 text-sm"
           >
-            Explore the partner program →
+            Explore the ambassador program →
           </Link>
         </div>
       </section>

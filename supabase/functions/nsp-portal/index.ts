@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
         .eq("id", body.id)
         .single();
       if (error || !p || p.status === "suspended")
-        return reply({ error: "Eligible partner record required" }, 400, origin);
+        return reply({ error: "Eligible ambassador record required" }, 400, origin);
       if (p.user_id)
         return reply(
           { error: "Account already linked. Use password reset for existing accounts." },
@@ -156,7 +156,7 @@ Deno.serve(async (req) => {
       if (!appUrl.startsWith("https://"))
         return reply({ error: "Public APP_URL must be configured" }, 400, origin);
       const { data, error: inviteError } = await service.auth.admin.inviteUserByEmail(p.email, {
-        redirectTo: appUrl + "/partner/reset",
+        redirectTo: appUrl + "/ambassador/reset",
       });
       if (inviteError || !data.user)
         return reply(
@@ -176,7 +176,7 @@ Deno.serve(async (req) => {
         return reply(
           {
             error:
-              "Invitation sent but account linking failed. Owner must repair the partner user_id in the database before access.",
+              "Invitation sent but account linking failed. Owner must repair the ambassador user_id in the database before access.",
           },
           500,
           origin,

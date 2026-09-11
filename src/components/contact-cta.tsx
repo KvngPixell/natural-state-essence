@@ -10,7 +10,7 @@ export function ContactCta() {
         </h2>
         <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-primary-foreground/75">
           Contact Natural State Peptides for product information, testing documentation,
-          partnerships, or general inquiries.
+          ambassador applications, or general inquiries.
         </p>
         <Link
           to="/contact"

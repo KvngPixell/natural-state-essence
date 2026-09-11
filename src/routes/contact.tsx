@@ -10,7 +10,7 @@ export const Route = createFileRoute("/contact")({
       typeof s["product"] === "string" && getProductBySlug(s["product"]) ? s["product"] : undefined,
     intent:
       typeof s["intent"] === "string" &&
-      ["coa", "product", "partnership", "application", "availability"].includes(s["intent"])
+      ["coa", "product", "ambassador", "partnership", "application", "availability"].includes(s["intent"])
         ? s["intent"]
         : undefined,
   }),
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/contact")({
       {
         name: "description",
         content:
-          "Ask about our research catalog, request documentation, or apply to partner with Natural State.",
+          "Ask about our research catalog, request documentation, or apply to become a Natural State ambassador.",
       },
     ],
   }),
@@ -34,7 +34,7 @@ function Contact() {
         <p className="eyebrow">Natural State Peptides</p>
         <h1 className="mt-5 font-serif text-5xl text-primary">A clear next step.</h1>
         <p className="mt-6 leading-relaxed text-muted-foreground">
-          Product questions, documentation requests and partnerships. Tell us what you need so we
+          Product questions, documentation requests and ambassador applications. Tell us what you need so we
           can help you find the right information.
         </p>
         <div className="rule-gold my-8" />
@@ -48,7 +48,7 @@ function Contact() {
       <div className={panel}>
         <InquiryForm
           initialProduct={s.product ?? ""}
-          initialKind={s.intent === "partnership" ? "application" : (s.intent ?? "product")}
+          initialKind={s.intent === "ambassador" || s.intent === "partnership" ? "application" : (s.intent ?? "product")}
         />
       </div>
     </section>

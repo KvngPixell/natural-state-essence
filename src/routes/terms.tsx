@@ -62,10 +62,10 @@ const sections: [string, string[]][] = [
     ],
   ],
   [
-    "7. Ambassador / partner program",
+    "7. Ambassador program",
     [
-      "Participation in the Natural State Partners program is by approval only and is governed by the individual commission, payout, and conduct terms provided to each approved partner at the time of acceptance. Those individual terms control in the event of any conflict with this page.",
-      "Partners must comply with the Natural State Partner Copy Guide, disclose their financial relationship near any endorsement, and must not make human-use, dosing, or therapeutic claims on Natural State's behalf.",
+      "Participation in the Natural State Ambassador program is by approval only and is governed by the individual commission, payout, and conduct terms provided to each approved ambassador at the time of acceptance. Those individual terms control in the event of any conflict with this page.",
+      "Ambassadors must comply with the Natural State Ambassador Copy Guide, disclose their financial relationship near any endorsement, and must not make human-use, dosing, or therapeutic claims on Natural State's behalf.",
     ],
   ],
   [

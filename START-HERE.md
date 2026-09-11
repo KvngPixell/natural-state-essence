@@ -8,7 +8,7 @@ This package contains the upgraded site and deployable backend code. It has NOT 
 2. Open the extracted `natural-state-essence-main` folder. You should see `src`, `public`, `supabase`, and `package.json`.
 3. In GitHub, open `KvngPixell/natural-state-essence` on `main` and choose **Add file → Upload files**.
 4. Drag the contents of the extracted folder into GitHub, including the folders. Upload the CONTENTS, not the ZIP or its outer folder. Commit the changes. If GitHub skips a hidden configuration file, open that existing file and replace its contents from this package separately.
-5. Return to Lovable and wait for Git sync/build. Check the homepage, catalog, Quality & Testing, and Partners pages. You can keep the site in preview while configuring the backend.
+5. Return to Lovable and wait for Git sync/build. Check the homepage, catalog, Quality & Testing, and Ambassadors pages. You can keep the site in preview while configuring the backend.
 
 ## 2. Activate the backend
 
@@ -30,18 +30,18 @@ Server-only secrets:
 | `EMAIL_FROM` | Sender on your verified Resend domain, e.g. Natural State <inquiries@your-domain>. |
 | `INQUIRY_TO` | Your chosen inbox receiving inquiry notifications. |
 
-Set Auth Site URL to APP_URL; allow the exact `/partner/reset` redirect on your live/test site. Configure Auth SMTP for reliable account invitation/reset emails. Disable public self-signup if using this invitation-only program. Owner setup: create/invite your Auth user, then add its UUID using the trusted database SQL editor:
+Set Auth Site URL to APP_URL; allow the exact `/ambassador/reset` redirect on your live/test site. Configure Auth SMTP for reliable account invitation/reset emails. Disable public self-signup if using this invitation-only program. Owner setup: create/invite your Auth user, then add its UUID using the trusted database SQL editor:
 
 ```sql
 insert into public.nsp_admins(user_id) values ('YOUR-OWNER-AUTH-USER-UUID');
 ```
 
-Log in at `/partner/login`, then open `/admin/partners`. Database administration is required for this initial step; there is no public “make me admin” action.
+Log in at `/ambassador/login`, then open `/admin/ambassadors`. Database administration is required for this initial step; there is no public “make me admin” action.
 
 ## 3. Run your ambassador program
 
 1. Review applications in owner controls → Inquiries.
-2. Add a partner with their email and unique code. Set the agreed commission percentage, written terms and payout hold. No commission rate has been assumed for you.
+2. Add an ambassador with their email and unique code. Set the agreed commission percentage, written terms and payout hold. No commission rate has been assumed for you.
 3. Send their account invitation. They set a password and access their dashboard.
 4. They copy their referral link or generate a QR code. Referral codes follow the current browsing session into inquiries. This version does not promise a multi-day tracking cookie.
 5. When an order is actually paid, enter its unique payment/order reference, partner, merchandise amount after discounts (excluding tax/shipping), products and payment date.
@@ -53,7 +53,7 @@ Ambassadors see their own sales, commission balances, terms, referral link, QR c
 ## 4. Check before publishing
 
 - Submit a product inquiry and COA request. Confirm each is stored in owner controls and the notification reaches your inbox. “Accepted” means the email provider accepted it, not proof of inbox delivery.
-- Invite two test partners. Confirm each sees only their own orders. Test sign-out and password reset.
+- Invite two test ambassadors. Confirm each sees only their own orders. Test sign-out and password reset.
 - Record a test paid order, partial refund, approval and payout; then review both dashboards. Use an isolated test database for test financial records.
 - Confirm product names, strengths, inventory and supplied bottle artwork on desktop and mobile. Bottle images are branded mockups based on your label; the provided SS-31 artwork is not evidence of testing for other batches.
 - Review current product documentation before supplying a COA. The site requests documents privately and makes no universal independent-testing promise.

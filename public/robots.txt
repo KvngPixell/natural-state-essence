@@ -14,5 +14,8 @@ User-agent: *
 Allow: /
 Disallow: /partner/
 Disallow: /admin/
+Disallow: /ambassador/login
+Disallow: /ambassador/dashboard
+Disallow: /ambassador/reset
 
 Sitemap: /sitemap.xml
