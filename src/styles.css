@@ -35,7 +35,11 @@
   --color-forest: var(--forest);
   --color-gold: var(--gold);
   --color-gold-ink: var(--gold-ink);
-  --font-serif: "Cormorant Garamond", Georgia, serif;
+  /* Playfair Display: higher stroke contrast and a larger x-height than
+     Cormorant Garamond, so headlines read denser and hold more presence.
+     To revert, swap this line and the font link in src/routes/__root.tsx
+     back to "Cormorant Garamond". */
+  --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --shadow-soft: 0 1px 2px oklch(0.22 0.05 155 / 0.04), 0 12px 32px -18px oklch(0.22 0.05 155 / 0.28);
   --shadow-lift: 0 2px 4px oklch(0.22 0.05 155 / 0.06), 0 24px 48px -24px oklch(0.22 0.05 155 / 0.35);

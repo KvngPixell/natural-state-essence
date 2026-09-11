@@ -89,7 +89,7 @@ const seeds: Seed[] = [
   {
     name: "Oxytocin",
     slug: "oxytocin",
-    strength: "10 mg",
+    strength: "5 mg",
     category: "Peptides",
     status: "Coming Soon",
     shortDescription:
@@ -166,6 +166,24 @@ const seeds: Seed[] = [
     status: "Coming Soon",
     shortDescription:
       "Growth-hormone-releasing hormone analogue studied for growth-hormone signaling, metabolism, and body-composition pathways.",
+  },
+  {
+    name: "Kisspeptin-10",
+    slug: "kisspeptin-10",
+    strength: "5 mg",
+    category: "Peptides",
+    status: "Coming Soon",
+    shortDescription:
+      "Signalling peptide studied in reproductive endocrinology research, including gonadotropin-releasing pathways and hormonal regulation mechanisms.",
+  },
+  {
+    name: "KPV",
+    slug: "kpv",
+    strength: "10 mg",
+    category: "Peptides",
+    status: "Coming Soon",
+    shortDescription:
+      "Tripeptide fragment studied for inflammatory-signalling pathways, cellular response mechanisms, and tissue-related research.",
   },
   {
     name: "Selank",

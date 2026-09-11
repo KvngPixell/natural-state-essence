@@ -40,50 +40,66 @@ const sections: [string, string[]][] = [
     ],
   ],
   [
-    "4. Certificates of Analysis and documentation",
+    "4. Ordering, shipping and delivery",
+    [
+      "Orders are arranged directly following an inquiry. Local pickup is available in Arkansas. For shipped orders, material is dispatched from Hot Springs, Arkansas, normally within 72 hours of an order being confirmed.",
+      "We currently ship within the United States only. Shipping is typically by USPS with tracking provided. Shipping cost is calculated at the time an order is arranged. We may offer free shipping on orders above a stated threshold; any such offer will be confirmed with your order rather than assumed.",
+      "Shipped material is packed appropriate to the product, including temperature-protective packaging where the product requires it.",
+    ],
+  ],
+  [
+    "5. Returns, damage and errors",
+    [
+      "All sales are final. Because these are laboratory research materials, we cannot accept returns or exchanges of correctly supplied product.",
+      "This does not remove our responsibility for our own mistakes. If material arrives damaged, or if the wrong product or strength is supplied, contact us within 7 days of delivery with the order reference and photographs where relevant, and we will correct it by replacement.",
+      "Claims made outside that window, or relating to storage, handling or use after delivery, cannot be accepted.",
+    ],
+  ],
+  [
+    "6. Certificates of Analysis and documentation",
     [
       "Documentation is shared upon request where available. A Certificate of Analysis or other report relates only to the specific sample and lot described in that report. It is not a guarantee that every unit of a product, or any other lot, matches the tested sample.",
     ],
   ],
   [
-    "5. Ambassador / partner program",
+    "7. Ambassador / partner program",
     [
       "Participation in the Natural State Partners program is by approval only and is governed by the individual commission, payout, and conduct terms provided to each approved partner at the time of acceptance. Those individual terms control in the event of any conflict with this page.",
       "Partners must comply with the Natural State Partner Copy Guide, disclose their financial relationship near any endorsement, and must not make human-use, dosing, or therapeutic claims on Natural State's behalf.",
     ],
   ],
   [
-    "6. Intellectual property",
+    "8. Intellectual property",
     [
       "The Natural State Peptides name, logo, site design, and original content are the property of Natural State Peptides and may not be copied or used without written permission.",
     ],
   ],
   [
-    "7. Disclaimer of warranties",
+    "9. Disclaimer of warranties",
     [
       'This site and the information on it are provided "as is" without warranties of any kind, express or implied, including implied warranties of merchantability, fitness for a particular purpose, or non-infringement.',
     ],
   ],
   [
-    "8. Limitation of liability",
+    "10. Limitation of liability",
     [
       "To the fullest extent permitted by law, Natural State Peptides is not liable for any indirect, incidental, special, or consequential damages arising from your use of this site or any product, including any use inconsistent with the research-use-only scope described above.",
     ],
   ],
   [
-    "9. Governing law",
+    "11. Governing law",
     [
       "These terms are governed by the laws of the State of Arkansas, without regard to conflict-of-law principles.",
     ],
   ],
   [
-    "10. Changes to these terms",
+    "12. Changes to these terms",
     [
       "We may update these terms from time to time. Continued use of the site after an update constitutes acceptance of the revised terms.",
     ],
   ],
   [
-    "11. Contact",
+    "13. Contact",
     ["Questions about these terms can be sent through our contact page."],
   ],
 ];

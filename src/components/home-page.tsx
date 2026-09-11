@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import hero from "@/assets/hero-arkansas.jpg";
+import arkansasHero from "@/assets/arkansas-hero.webp";
 import { products } from "@/data/products";
 import { ProductVial } from "@/components/product-vial";
-import { ProductCard } from "@/components/product-card";
 import { button, outline, panel } from "@/lib/backend";
 import { FaqSchema } from "@/components/structured-data";
 const faq = [
@@ -31,6 +31,14 @@ const faq = [
     "Lyophilised material should be kept refrigerated at 2–8°C, protected from light and moisture, and handled according to standard laboratory practice.",
   ],
   [
+    "How does shipping work?",
+    "Local pickup is available in Arkansas. Shipped orders go out from Hot Springs, Arkansas, normally within 72 hours of the order being confirmed, by USPS with tracking. We ship within the United States only at this time.",
+  ],
+  [
+    "What if something arrives damaged or wrong?",
+    "All sales are final, but that does not cover our own mistakes. If material arrives damaged, or the wrong product or strength is supplied, contact us within 7 days of delivery and we will replace it. Full detail is on the Terms page.",
+  ],
+  [
     "How do I contact the team?",
     "Use the inquiry page for product information, availability, or documentation questions. Facebook messaging is also available.",
   ],
@@ -52,18 +60,24 @@ export function HomePage() {
           width={1920}
           height={1088}
         />
-        <div className="absolute inset-0 -z-10 bg-background/90" />
+        {/* Scrim over the Arkansas photo. Lighter on the left where the headline
+            sits, so the landscape stays visible without costing legibility. */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-background/92 via-background/82 to-background/70" />
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[1.15fr_.85fr] lg:py-12">
           <div>
             <p className="eyebrow">From the Natural State</p>
             <h1 className="mt-5 max-w-2xl font-serif text-5xl leading-[1.02] text-primary sm:text-6xl lg:text-7xl">
-              Research compounds.
+              Rooted in the
               <br />
-              <span className="italic">A clear next step.</span>
+              Natural State.
             </h1>
+            <p className="mt-4 max-w-xl font-serif text-2xl italic text-primary/85 sm:text-3xl">
+              Research compounds. A clear next step.
+            </p>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-foreground/75">
-              Explore Natural State’s current catalog, check availability, and request the
-              documentation available for your product.
+              Explore the catalog. Check availability.
+              <br />
+              Request product documentation.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a href="#in-stock" className={button}>
@@ -77,8 +91,17 @@ export function HomePage() {
               Arkansas-based · Laboratory research only · Documentation upon request
             </p>
           </div>
-          <div className="hidden max-h-[430px] overflow-hidden rounded-[2rem] border border-accent/20 shadow-soft lg:block">
-            {available[0] && <ProductVial product={available[0]} eager className="-my-6" />}
+          {/* Floats on the page rather than sitting in a card: the artwork carries
+              its own gold frame, so a second border around it reads as a sticker. */}
+          <div className="hidden justify-center lg:flex">
+            <img
+              src={arkansasHero}
+              alt="The state of Arkansas rendered as a gold-framed window onto a sunrise over forested ridges and a river"
+              className="w-full max-w-[26rem] drop-shadow-[0_24px_40px_rgba(8,39,25,0.22)]"
+              width={900}
+              height={1139}
+              loading="eager"
+            />
           </div>
         </div>
       </section>
@@ -92,9 +115,36 @@ export function HomePage() {
             Explore the full catalog →
           </Link>
         </div>
-        <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="mt-9 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {available.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <article
+              key={p.id}
+              className="group flex items-center gap-5 border-border sm:not-first:border-l sm:not-first:pl-8 lg:[&:nth-child(3n+1)]:border-l-0 lg:[&:nth-child(3n+1)]:pl-0"
+            >
+              <div className="w-24 shrink-0 sm:w-28">
+                <ProductVial product={p} />
+              </div>
+              <div className="min-w-0">
+                {/* Long blend names would otherwise run to three lines and break
+                    the row's shared baseline, so they step down a size. */}
+                <h3
+                  className={`font-serif leading-tight text-primary ${
+                    p.name.length > 18 ? "text-lg" : "text-2xl"
+                  }`}
+                >
+                  {p.name}
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">{p.strength}</p>
+                <div className="rule-gold mt-3" />
+                <Link
+                  to="/product/$slug"
+                  params={{ slug: p.slug }}
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm text-primary underline underline-offset-4 transition-colors group-hover:text-accent"
+                >
+                  View Product <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+            </article>
           ))}
         </div>
       </section>
