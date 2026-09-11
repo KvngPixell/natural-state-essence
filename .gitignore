@@ -30,3 +30,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Hand-off bundles (zips passed around during development)
+*.zip
