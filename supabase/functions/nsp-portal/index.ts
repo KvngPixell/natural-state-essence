@@ -27,6 +27,11 @@ const PAYMENT_LABEL: Record<string, string> = {
   crypto: "Crypto",
   other: "Other",
 };
+const FULFIL_LABEL: Record<string, string> = {
+  pickup: "Local pickup",
+  delivery: "Local delivery",
+  ship: "Ship",
+};
 const str = (v: unknown, max: number) => v == null || (typeof v === "string" && v.length <= max);
 const visitorOk = (v: unknown) => v == null || (typeof v === "string" && /^[A-Za-z0-9-]{8,64}$/.test(v));
 
@@ -49,9 +54,21 @@ async function sendNotice(id: string) {
     await service.from("nsp_requests").update({ email_status: "not_configured" }).eq("id", id);
     return "not_configured";
   }
-  const items = Array.isArray(r.order_items)
-    ? r.order_items.map((i: { name: string; quantity: number }) => "  " + i.quantity + " × " + i.name).join("\n")
-    : "";
+  // Estimates come from the published price list via the browser; the owner
+  // confirms the real total, so they are labelled as estimates only.
+  const lines: { name: string; quantity: number; est_cents?: number | null }[] = Array.isArray(r.order_items)
+    ? r.order_items
+    : [];
+  const dollars = (c: number) => "$" + (c / 100).toLocaleString("en-US", { maximumFractionDigits: 2 });
+  const items = lines
+    .map(
+      (i) =>
+        "  " + i.quantity + " × " + i.name +
+        (typeof i.est_cents === "number" ? " — est. " + dollars(i.est_cents) : "est_cents" in i ? " — quote needed" : ""),
+    )
+    .join("\n");
+  const estTotal = lines.reduce((a, i) => a + (typeof i.est_cents === "number" ? i.est_cents : 0), 0);
+  const allPriced = lines.length > 0 && lines.every((i) => typeof i.est_cents === "number");
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -71,10 +88,13 @@ async function sendNotice(id: string) {
           "Reply: " + r.email,
           "Phone: " + (r.phone ?? ""),
           r.kind === "order" ? "Order:\n" + items : "Product: " + (r.product ?? ""),
+          r.kind === "order" && estTotal > 0
+            ? "Estimated total: " + dollars(estTotal) + (allPriced ? "" : " + items to quote")
+            : "",
           r.kind === "order"
             ? "Payment: " + (PAYMENT_LABEL[r.payment_method] ?? "") + (r.payment_other ? " (" + r.payment_other + ")" : "")
             : "",
-          r.kind === "order" ? "Fulfilment: " + (r.fulfillment_method === "pickup" ? "Local pickup" : "Ship") : "",
+          r.kind === "order" ? "Fulfilment: " + (FULFIL_LABEL[r.fulfillment_method] ?? "") : "",
           "Lot: " + (r.lot ?? ""),
           "Referral: " + (r.referral_code ?? ""),
           "",
@@ -120,10 +140,14 @@ function validSubmission(b: Record<string, unknown>) {
       if (typeof i.name !== "string" || !i.name.trim() || i.name.length > 150) return false;
       if (!Number.isInteger(i.quantity) || (i.quantity as number) < 1 || (i.quantity as number) > 100) return false;
       if (i.slug != null && (typeof i.slug !== "string" || !/^[a-z0-9-]{1,80}$/.test(i.slug))) return false;
+      if (i.est_cents != null && (!Number.isInteger(i.est_cents) || (i.est_cents as number) < 0 || (i.est_cents as number) > 10_000_000))
+        return false;
     }
     if (!PAYMENT.includes(String(b.payment_method))) return false;
     if (!str(b.payment_other, 100)) return false;
-    if (!["ship", "pickup"].includes(String(b.fulfillment_method))) return false;
+    // The public form offers pickup and local delivery; "ship" is still accepted
+    // from pages cached before shipping was paused.
+    if (!["pickup", "delivery", "ship"].includes(String(b.fulfillment_method))) return false;
     if (b.research_ack !== true) return false;
     if (typeof b.phone !== "string" || b.phone.replace(/\D/g, "").length < 7) return false;
   }

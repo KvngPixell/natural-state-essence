@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { rpc, fmtDateTime, button, outline, panel, field, errorText, paymentLabel } from "@/lib/backend";
+import { rpc, money, fmtDateTime, button, outline, panel, field, errorText, paymentLabel } from "@/lib/backend";
 import { useOwner } from "@/components/owner/owner-context";
-import type { RequestRecord } from "@/lib/program-types";
+import { FULFIL_METHOD_LABEL, type RequestRecord } from "@/lib/program-types";
 import { Empty, Notice, Pill } from "@/components/program-ui";
 
 const KIND_LABEL: Record<string, string> = {
@@ -93,7 +93,16 @@ export function Inquiries() {
                   {r.kind === "order" && (
                     <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                       <div><dt className="text-xs text-muted-foreground">Payment</dt><dd>{paymentLabel(r.payment_method)}{r.payment_other ? ` (${r.payment_other})` : ""}</dd></div>
-                      <div><dt className="text-xs text-muted-foreground">Fulfilment</dt><dd>{r.fulfillment_method === "pickup" ? "Local pickup" : "Ship"}</dd></div>
+                      <div><dt className="text-xs text-muted-foreground">Fulfilment</dt><dd>{FULFIL_METHOD_LABEL[r.fulfillment_method ?? ""] ?? "—"}</dd></div>
+                      {r.order_items?.some((i) => typeof i.est_cents === "number") && (
+                        <div className="col-span-2">
+                          <dt className="text-xs text-muted-foreground">Estimate at list price</dt>
+                          <dd>
+                            {money(r.order_items.reduce((a, i) => a + (i.est_cents ?? 0), 0))}
+                            {r.order_items.some((i) => i.est_cents == null) ? " + items to quote" : ""}
+                          </dd>
+                        </div>
+                      )}
                     </dl>
                   )}
                   {r.referral_code && (

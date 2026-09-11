@@ -223,7 +223,7 @@ export interface RequestRecord {
   referral_source: string | null;
   partner_id: string | null;
   ambassador_name: string | null;
-  order_items: { slug?: string; name: string; quantity: number }[] | null;
+  order_items: { slug?: string; name: string; quantity: number; est_cents?: number | null }[] | null;
   payment_method: string | null;
   payment_other: string | null;
   fulfillment_method: string | null;
@@ -282,6 +282,11 @@ export const STATUS_LABEL: Record<string, string> = {
   cancelled: "Cancelled",
   refunded: "Refunded",
   disputed: "Disputed",
+};
+export const FULFIL_METHOD_LABEL: Record<string, string> = {
+  pickup: "Local pickup",
+  delivery: "Local delivery",
+  ship: "Shipped",
 };
 export const FULFILMENT_LABEL: Record<string, string> = {
   unfulfilled: "Not yet sent",

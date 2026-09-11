@@ -46,9 +46,26 @@ export function OrganizationSchema() {
   );
 }
 
-/** Product entity plus its breadcrumb trail. No offers/pricing: this site does not sell online. */
+/**
+ * Product entity plus its breadcrumb trail. Offers carry the published
+ * single-vial prices; orders are arranged directly, not checked out online.
+ */
 export function ProductSchema({ product }: { product: Product }) {
   const url = SITE + "/product/" + product.slug;
+  const priced = product.variants.filter((v) => v.prices);
+  const singles = priced.map((v) => v.prices![0]);
+  const offers = priced.length
+    ? {
+        "@type": "AggregateOffer",
+        priceCurrency: "USD",
+        lowPrice: Math.min(...singles),
+        highPrice: Math.max(...singles),
+        offerCount: priced.length,
+        availability:
+          product.status === "In Stock" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        url,
+      }
+    : undefined;
   return (
     <JsonLd
       data={{
@@ -64,11 +81,12 @@ export function ProductSchema({ product }: { product: Product }) {
               product.shortDescription +
               " Supplied for laboratory research use only; not for human or animal consumption.",
             brand: { "@type": "Brand", name: "Natural State Peptides" },
+            ...(offers ? { offers } : {}),
             additionalProperty: [
               {
                 "@type": "PropertyValue",
                 name: "Strength",
-                value: product.strength,
+                value: product.variants.map((v) => v.strength).join(", "),
               },
               {
                 "@type": "PropertyValue",

@@ -21,7 +21,7 @@ const sections: [string, string[]][] = [
   [
     "Information we collect",
     [
-      "When you submit a product inquiry, an order request, a COA request, an availability request, or an ambassador application, we collect the information you provide: your first and last name, email address, phone number, city and state (for applications), your message, the products and quantities you ask about, your preferred payment method (for example cash, Cash App, Venmo, crypto or other) and whether you prefer shipping or pickup.",
+      "When you submit a product inquiry, an order request, a COA request, an availability request, or an ambassador application, we collect the information you provide: your first and last name, email address, phone number, city and state (for applications), your message, the products and quantities you ask about, your preferred payment method (for example cash, Cash App, Venmo, crypto or other) and whether you prefer pickup or local delivery (and, for delivery, the details needed to deliver).",
       "When you buy from us, we keep a customer record with a permanent customer ID and an order record for each purchase: the date, products, amounts paid, order status, how it was fulfilled, and which ambassador (if any) referred you.",
       "If you are an approved ambassador, we additionally store your name, contact details, city and state, referral code, account email, and the attributed customers, recorded sales, commission statements, adjustments and payouts associated with your account.",
       "We do not collect payment card or bank details through this site. This site does not process checkout or payments; payment is arranged directly with our team.",

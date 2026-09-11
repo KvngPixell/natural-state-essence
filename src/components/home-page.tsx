@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import hero from "@/assets/hero-arkansas.jpg";
 import arkansasHero from "@/assets/arkansas-hero.webp";
-import { products } from "@/data/products";
+import { products, usd } from "@/data/products";
 import { ProductVial } from "@/components/product-vial";
 import { button, outline, panel } from "@/lib/backend";
 import { FaqSchema } from "@/components/structured-data";
@@ -31,12 +31,12 @@ const faq = [
     "Lyophilised material should be kept refrigerated at 2–8°C, protected from light and moisture, and handled according to standard laboratory practice.",
   ],
   [
-    "How does shipping work?",
-    "Local pickup is available in Arkansas. Shipped orders go out from Hot Springs, Arkansas, normally within 72 hours of the order being confirmed, by USPS with tracking. We ship within the United States only at this time.",
+    "Do you ship?",
+    "Not at the moment. We offer local pickup and local delivery in the Hot Springs, Arkansas area. Place an order request on any in-stock product and we'll confirm your total and arrange a time with you.",
   ],
   [
-    "What if something arrives damaged or wrong?",
-    "All sales are final, but that does not cover our own mistakes. If material arrives damaged, or the wrong product or strength is supplied, contact us within 7 days of delivery and we will replace it. Full detail is on the Terms page.",
+    "What if something is damaged or wrong?",
+    "All sales are final, but that does not cover our own mistakes. If material is damaged, or the wrong product or strength is supplied, contact us within 7 days of pickup or delivery and we will replace it. Full detail is on the Terms page.",
   ],
   [
     "How do I contact the team?",
@@ -48,7 +48,9 @@ const faq = [
   ],
 ];
 export function HomePage() {
-  const available = products.filter((p) => p.status === "In Stock");
+  const inStock = products.filter((p) => p.status === "In Stock");
+  // Featured in-stock items on the homepage; the catalog lists everything.
+  const available = inStock.filter((p) => p.featured).slice(0, 6);
   return (
     <>
       <FaqSchema items={faq} />
@@ -115,7 +117,7 @@ export function HomePage() {
             <h2 className="mt-3 font-serif text-4xl text-primary">The current collection</h2>
           </div>
           <Link to="/catalog" className="text-sm underline underline-offset-4">
-            Explore the full catalog →
+            All {inStock.length} in stock →
           </Link>
         </div>
         <div className="mt-9 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
@@ -137,7 +139,10 @@ export function HomePage() {
                 >
                   {p.name}
                 </h3>
-                <p className="mt-1 text-sm text-muted-foreground">{p.strength}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {p.variants.map((v) => v.strength).join(" · ")}
+                  {p.fromPrice != null && <span className="text-primary"> · from {usd(p.fromPrice)}</span>}
+                </p>
                 <div className="rule-gold mt-3" />
                 <Link
                   to="/product/$slug"

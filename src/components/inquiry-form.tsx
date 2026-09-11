@@ -60,7 +60,7 @@ export function InquiryForm({
       : kind === "application"
         ? "I'd like to apply to the ambassador program."
         : "I'd like product information and availability.",
-    p ? p.name + " — " + p.strength : "",
+    p ? p.name + " — " + p.variants.map((v) => v.strength).join(" / ") : "",
     kind === "coa" && lot ? "Lot: " + lot : "",
     effectiveCode ? "Referral: " + effectiveCode : "",
     name ? "Name: " + name : "",
@@ -90,7 +90,7 @@ export function InquiryForm({
           phone: phone.trim() || null,
           city: kind === "application" ? city.trim() || null : null,
           state: kind === "application" ? state.trim() || null : null,
-          product: p ? p.name + " " + p.strength : null,
+          product: p ? p.name + " " + p.variants.map((v) => v.strength).join(" / ") : null,
           lot: kind === "coa" ? lot : null,
           message: message.trim() || draft,
           referral_code: effectiveCode || null,
@@ -221,7 +221,7 @@ export function InquiryForm({
               <option value="">Select a product (optional)</option>
               {products.map((x) => (
                 <option key={x.slug} value={x.slug}>
-                  {x.name} — {x.strength}
+                  {`${x.name} — ${x.variants.map((v) => v.strength).join(" / ")}`}
                 </option>
               ))}
             </select>

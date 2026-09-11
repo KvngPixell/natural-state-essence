@@ -8,20 +8,24 @@ import type { Product } from "@/data/products";
  */
 export function ProductVial({
   product,
+  strength,
   eager = false,
   className = "",
 }: {
   product: Product;
+  /** Strength printed on the label; defaults to the product's first strength. */
+  strength?: string;
   eager?: boolean;
   className?: string;
 }) {
   const long = product.name.length > 16;
+  const label = strength ?? product.strength;
 
   return (
     <div className={`relative aspect-square w-full overflow-hidden ${className}`}>
       <img
         src={product.slug === "ss-31" ? ssImage : vialImage}
-        alt={`${product.name} ${product.strength} vial from Natural State Peptides`}
+        alt={`${product.name} ${label} vial from Natural State Peptides`}
         loading={eager ? "eager" : "lazy"}
         width={1254}
         height={1254}
@@ -48,7 +52,7 @@ export function ProductVial({
             className="mt-[0.4em] font-serif tracking-[0.12em] text-[#9a7b3f] uppercase"
             style={{ fontSize: "11cqw" }}
           >
-            {product.strength}
+            {label}
           </span>
         </div>
       )}

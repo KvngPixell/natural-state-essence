@@ -3,7 +3,7 @@ import { SimplePage } from "@/components/simple-page";
 
 const title = "Terms — Natural State Peptides";
 const description =
-  "Terms of use for Natural State Peptides: research-use-only scope, order requests, ambassador program and commission terms, and limitation of liability.";
+  "Terms of use for Natural State Peptides: research-use-only scope, pricing and order requests, local pickup and delivery, ambassador program terms, and limitation of liability.";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -41,19 +41,19 @@ const sections: [string, string[]][] = [
     ],
   ],
   [
-    "4. Ordering, shipping and delivery",
+    "4. Pickup and local delivery",
     [
-      "Orders are arranged directly following an inquiry. Local pickup is available in Arkansas. For shipped orders, material is dispatched from Hot Springs, Arkansas, normally within 72 hours of an order being confirmed.",
-      "We currently ship within the United States only. Shipping is typically by USPS with tracking provided. Shipping cost is calculated at the time an order is arranged. We may offer free shipping on orders above a stated threshold; any such offer will be confirmed with your order rather than assumed.",
-      "Shipped material is packed appropriate to the product, including temperature-protective packaging where the product requires it.",
+      "We currently offer local pickup and local delivery in the Hot Springs, Arkansas area only. We are not shipping orders at this time. When you place an order request, we will confirm your total and arrange a pickup time or delivery details with you directly.",
+      "Prices shown on this site are for 1, 2 or 3 vials of a product and strength. Larger quantities are quoted individually. Prices and availability may change, and your total is only final once we confirm it with you. Any delivery fee will be confirmed before you pay.",
+      "Material is packed appropriate to the product, including temperature-protective packaging where the product requires it.",
     ],
   ],
   [
     "5. Returns, damage and errors",
     [
       "All sales are final. Because these are laboratory research materials, we cannot accept returns or exchanges of correctly supplied product.",
-      "This does not remove our responsibility for our own mistakes. If material arrives damaged, or if the wrong product or strength is supplied, contact us within 7 days of delivery with the order reference and photographs where relevant, and we will correct it by replacement.",
-      "Claims made outside that window, or relating to storage, handling or use after delivery, cannot be accepted.",
+      "This does not remove our responsibility for our own mistakes. If material is damaged when you receive it, or if the wrong product or strength is supplied, contact us within 7 days of pickup or delivery with the order reference and photographs where relevant, and we will correct it by replacement.",
+      "Claims made outside that window, or relating to storage, handling or use after you receive the material, cannot be accepted.",
     ],
   ],
   [
@@ -67,7 +67,7 @@ const sections: [string, string[]][] = [
     [
       "Participation in the Natural State Ambassador program is by approval only. Approved ambassadors receive a personal referral link and code and a private dashboard. The specific commission rates, rank thresholds, residual period and payout timing in effect are shown in the ambassador dashboard and confirmed at approval; any individual written terms control in the event of a conflict with this page.",
       "Attribution. A customer is credited to an ambassador when they arrive through that ambassador's referral link within the referral window, or when the ambassador's code is provided with their request or purchase. A customer is treated as a new customer only once; after their first purchase they remain attributed to the same ambassador, and repeat purchases may earn a residual commission for the residual period. Attribution is determined from our records, and Natural State may correct attribution in cases of error, duplicate records, or abuse.",
-      "Commission basis. Commission is calculated only on recorded, paid product amounts actually received, after discounts. Shipping, taxes, fees, refunded or cancelled amounts, disputed payments, excluded products, and purchases by an ambassador for themselves or their own household do not earn commission. Clicks, visits and inquiries do not earn commission on their own.",
+      "Commission basis. Commission is calculated only on recorded, paid product amounts actually received, after discounts. Delivery or shipping fees, taxes, other fees, refunded or cancelled amounts, disputed payments, excluded products, and purchases by an ambassador for themselves or their own household do not earn commission. Clicks, visits and inquiries do not earn commission on their own.",
       "Monthly statements. Rank is determined by an ambassador's total qualified revenue in a calendar month (Central time), and the rank reached applies to all new-customer sales in that month. Commission for a month is finalized after the month closes and is approved by Natural State before payment. Refunds or chargebacks after payment may be deducted from later commission.",
       "Payouts are made outside this site by the method agreed with the ambassador and are recorded in the dashboard. Ambassadors are independent participants, not employees, and are responsible for their own taxes. We may request tax information before paying commission.",
       "Conduct. Ambassadors must follow the Natural State brand guidance, clearly disclose their financial relationship near any endorsement, and must not make human-use, dosing, therapeutic, or income claims, send spam, create fake reviews, or refer themselves. Natural State may suspend or end participation, and withhold commission connected to a violation, at its discretion.",

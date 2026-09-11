@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { rpc, money, fmtDate, fmtDateTime, button, outline, field, errorText, pct, paymentLabel, toCents, centsToInput, todayISO } from "@/lib/backend";
 import { useOwner } from "@/components/owner/owner-context";
 import type { OrderRecord, OrderRow } from "@/lib/program-types";
-import { FULFILMENT_LABEL, STATUS_LABEL } from "@/lib/program-types";
+import { FULFIL_METHOD_LABEL, FULFILMENT_LABEL, STATUS_LABEL } from "@/lib/program-types";
 import { Empty, Modal, Notice, Pill, TableWrap, td, th } from "@/components/program-ui";
 import { SaleOutcome } from "@/components/owner/record-sale";
 import { actionLabel } from "@/components/owner/overview";
@@ -139,8 +139,8 @@ export function OrderDetail({ id, onClose }: { id: string; onClose: () => void }
             <div><dt className="text-xs text-muted-foreground">Amount paid (products)</dt><dd>{money(o.product_paid_cents)}</dd></div>
             <div><dt className="text-xs text-muted-foreground">Discount</dt><dd>{money(o.discount_cents)}</dd></div>
             <div><dt className="text-xs text-muted-foreground">Qualified revenue</dt><dd>{money(o.qualified_cents - o.refunded_cents)}{o.excluded_cents ? ` (${money(o.excluded_cents)} excluded)` : ""}</dd></div>
-            <div><dt className="text-xs text-muted-foreground">Shipping charged</dt><dd>{money(o.shipping_cents)}</dd></div>
-            <div><dt className="text-xs text-muted-foreground">Fulfilment</dt><dd>{FULFILMENT_LABEL[o.fulfillment_status]}{o.fulfillment_method ? ` · ${o.fulfillment_method === "pickup" ? "pickup" : "ship"}` : ""}</dd></div>
+            <div><dt className="text-xs text-muted-foreground">Delivery fee</dt><dd>{money(o.shipping_cents)}</dd></div>
+            <div><dt className="text-xs text-muted-foreground">Fulfilment</dt><dd>{FULFILMENT_LABEL[o.fulfillment_status]}{o.fulfillment_method ? ` · ${FULFIL_METHOD_LABEL[o.fulfillment_method] ?? o.fulfillment_method}` : ""}</dd></div>
             <div><dt className="text-xs text-muted-foreground">Reference</dt><dd>{o.reference ?? "—"}</dd></div>
             <div><dt className="text-xs text-muted-foreground">Commission</dt><dd>{o.commission_cents ? `${pct(o.commission_bps)} · ${money(o.commission_cents)}` : "—"}</dd></div>
             <div><dt className="text-xs text-muted-foreground">Referral input</dt><dd>{o.referred_partner_name ?? "—"}{o.referral_source ? ` (${o.referral_source})` : ""}</dd></div>
@@ -303,7 +303,7 @@ function EditForm({ o, onDone }: { o: OrderRecord; onDone: () => void }) {
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="grid gap-1">Amount paid (products)<input className={field} inputMode="decimal" value={paid} onChange={(e) => setPaid(e.target.value)} /></label>
         <label className="grid gap-1">Discount<input className={field} inputMode="decimal" value={discount} onChange={(e) => setDiscount(e.target.value)} /></label>
-        <label className="grid gap-1">Shipping charged<input className={field} inputMode="decimal" value={shipping} onChange={(e) => setShipping(e.target.value)} /></label>
+        <label className="grid gap-1">Delivery fee<input className={field} inputMode="decimal" value={shipping} onChange={(e) => setShipping(e.target.value)} /></label>
         <label className="grid gap-1 sm:col-span-3">Reference<input className={field} value={reference} onChange={(e) => setReference(e.target.value)} /></label>
         <label className="grid gap-1 sm:col-span-3">Notes<textarea className={field} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} /></label>
       </div>

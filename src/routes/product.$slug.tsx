@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useState } from "react";
 import { FileText, FlaskConical } from "lucide-react";
 
-import { getProductBySlug, products, RESEARCH_DISCLAIMER } from "@/data/products";
+import { getProductBySlug, products, usd, MAX_PRICED_QTY, RESEARCH_DISCLAIMER, type Variant } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 import { ContactCta } from "@/components/contact-cta";
 import { ProductVial } from "@/components/product-vial";
@@ -46,6 +47,9 @@ export const Route = createFileRoute("/product/$slug")({
 
 function ProductDetail() {
   const { product } = Route.useLoaderData();
+  const [sku, setSku] = useState(product.variants[0].sku);
+  const variant = product.variants.find((v) => v.sku === sku) ?? product.variants[0];
+  const orderable = variant.status === "In Stock";
   const related = products.filter((p) => p.slug !== product.slug).slice(0, 4);
 
   const sections = [
@@ -69,19 +73,42 @@ function ProductDetail() {
 
           <div className="mt-8 grid gap-12 pb-16 lg:grid-cols-2 lg:items-start">
             <div className="overflow-hidden rounded-lg border border-border bg-card shadow-soft">
-              <ProductVial product={product} eager />
+              <ProductVial product={product} strength={variant.strength} eager />
             </div>
 
             <div>
               <div className="flex flex-wrap items-center gap-4">
                 <p className="eyebrow">{product.category}</p>
-                <StatusBadge status={product.status} />
+                <StatusBadge status={variant.status} />
               </div>
               <h1 className="mt-4 font-serif text-5xl text-primary sm:text-6xl">{product.name}</h1>
-              <p className="mt-3 text-base text-muted-foreground">{product.strength}</p>
+              {product.variants.length > 1 ? (
+                <div role="radiogroup" aria-label="Strength" className="mt-4 flex flex-wrap gap-2">
+                  {product.variants.map((v) => (
+                    <button
+                      key={v.sku}
+                      type="button"
+                      role="radio"
+                      aria-checked={v.sku === variant.sku}
+                      onClick={() => setSku(v.sku)}
+                      className={
+                        "rounded-md border px-5 py-2.5 text-sm transition-colors " +
+                        (v.sku === variant.sku
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-primary/25 text-primary hover:border-accent")
+                      }
+                    >
+                      {v.strength}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 text-base text-muted-foreground">{product.strength}</p>
+              )}
               <p className="mt-6 max-w-lg text-base leading-relaxed text-foreground/75">
                 {product.shortDescription}
               </p>
+              <PricePanel variant={variant} />
 
               <ul className="mt-8 grid gap-3 sm:grid-cols-2">
                 {badges.map(({ icon: Icon, label }) => (
@@ -96,7 +123,7 @@ function ProductDetail() {
               </ul>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                {product.status === "In Stock" && (
+                {orderable && (
                   <a
                     href="#order"
                     className="inline-flex justify-center rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
@@ -108,12 +135,12 @@ function ProductDetail() {
                   to="/contact"
                   search={{ product: product.slug, intent: "product" }}
                   className={
-                    product.status === "In Stock"
+                    orderable
                       ? "inline-flex justify-center rounded-md border border-primary/25 px-7 py-3.5 text-sm text-primary transition-colors hover:border-accent"
                       : "inline-flex justify-center rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
                   }
                 >
-                  {product.status === "Coming Soon"
+                  {!orderable
                     ? "Ask About Availability"
                     : "Inquire About This Product"}
                 </Link>
@@ -145,10 +172,11 @@ function ProductDetail() {
           ))}
         </div>
 
-        {product.status === "Coming Soon" && <AvailabilityNotify product={product} />}
-        {product.status === "In Stock" && (
+        {!orderable && <AvailabilityNotify product={product} />}
+        {orderable && (
           <div className="mt-16">
-            <OrderForm initialProduct={product.slug} />
+            {/* Keyed so switching strength above pre-selects it in the form. */}
+            <OrderForm key={variant.sku} initialProduct={variant.sku} />
           </div>
         )}
 
@@ -171,5 +199,38 @@ function ProductDetail() {
 
       <ContactCta />
     </>
+  );
+}
+
+function PricePanel({ variant }: { variant: Variant }) {
+  const p = variant.prices;
+  return (
+    <div className="mt-6 max-w-lg rounded-lg border border-border bg-card p-5 shadow-soft">
+      <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Price · {variant.strength}</p>
+      {p ? (
+        <>
+          <dl className="mt-4 grid grid-cols-3 divide-x divide-border text-center">
+            {p.map((price, i) => {
+              const save = p[0] * (i + 1) - price;
+              return (
+                <div key={i} className="px-2">
+                  <dt className="text-xs text-muted-foreground">
+                    {i + 1} vial{i ? "s" : ""}
+                  </dt>
+                  <dd className="mt-1 font-serif text-2xl text-primary tabular-nums sm:text-3xl">{usd(price)}</dd>
+                  {save > 0 && <dd className="mt-0.5 text-[0.7rem] text-accent">save {usd(save)}</dd>}
+                </div>
+              );
+            })}
+          </dl>
+          <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+            More than {MAX_PRICED_QTY} vials? We'll quote you. Payment is arranged directly — cash, Cash App,
+            Venmo or crypto. Local pickup or delivery in the Hot Springs, Arkansas area.
+          </p>
+        </>
+      ) : (
+        <p className="mt-3 text-sm text-muted-foreground">Pricing will be posted when this becomes available.</p>
+      )}
+    </div>
   );
 }

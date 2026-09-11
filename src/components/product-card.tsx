@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { Product } from "@/data/products";
+import { usd, type Product } from "@/data/products";
 import { ProductVial } from "@/components/product-vial";
 import { StatusBadge } from "@/components/status-badge";
 
@@ -19,7 +19,19 @@ export function ProductCard({ product }: { product: Product }) {
           {product.category}
         </p>
         <h3 className="mt-2 font-serif text-2xl text-primary">{product.name}</h3>
-        <p className="mt-1 text-sm text-muted-foreground">{product.strength}</p>
+        <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <p className="text-sm text-muted-foreground">{product.variants.map((v) => v.strength).join(" · ")}</p>
+          <p className="text-sm text-primary">
+            {product.fromPrice != null ? (
+              <>
+                <span className="text-muted-foreground">from </span>
+                <span className="font-serif text-lg">{usd(product.fromPrice)}</span>
+              </>
+            ) : (
+              <span className="text-muted-foreground">Price coming soon</span>
+            )}
+          </p>
+        </div>
         <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground/75">
           {product.shortDescription}
         </p>

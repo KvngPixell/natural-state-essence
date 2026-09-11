@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { rpc, money, pct, fmtDateTime, field, button, outline, panel, errorText, toCents, centsToInput } from "@/lib/backend";
-import { products } from "@/data/products";
+import { skus } from "@/data/products";
 import { useOwner } from "@/components/owner/owner-context";
 import type { ProgramSettings } from "@/lib/program-types";
 import { Notice } from "@/components/program-ui";
@@ -195,14 +195,14 @@ export function ProgramSettingsPanel() {
           <p className="text-sm text-muted-foreground">Sales of checked products still count as orders but add $0 to qualified revenue.</p>
         </div>
         <div className="grid gap-1.5 sm:grid-cols-2">
-          {products.map((p) => (
-            <label key={p.slug} className="flex items-center gap-2 text-sm">
+          {skus.map((p) => (
+            <label key={p.sku} className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
-                checked={excluded.includes(p.slug)}
-                onChange={(e) => setExcluded(e.target.checked ? [...excluded, p.slug] : excluded.filter((x) => x !== p.slug))}
+                checked={excluded.includes(p.sku)}
+                onChange={(e) => setExcluded(e.target.checked ? [...excluded, p.sku] : excluded.filter((x) => x !== p.sku))}
               />
-              <span className="min-w-0 truncate">{p.name}</span>
+              <span className="min-w-0 truncate">{p.label}</span>
             </label>
           ))}
         </div>

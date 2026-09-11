@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Minus, Plus, X } from "lucide-react";
-import { products, getProductBySlug } from "@/data/products";
+import { skus, getSku, priceCents, usd, MAX_PRICED_QTY } from "@/data/products";
 import { usePortal } from "@/components/portal-context";
 import { backendReady, edge, field, button, outline, errorText, PAYMENT_METHODS } from "@/lib/backend";
 import { checkCode, visitorId } from "@/lib/referral";
@@ -8,10 +8,18 @@ import { checkCode, visitorId } from "@/lib/referral";
 /**
  * Order request. Natural State does not take payment on the site: this sends
  * the owner what the customer wants, how many, how they intend to pay, and
- * whether they want shipping or pickup. The owner confirms availability and
- * total, arranges payment directly, and records the sale once it is paid.
+ * whether they want pickup or local delivery. Shows an estimate from the
+ * published 1–3 vial prices; larger quantities are quoted. The owner confirms
+ * availability and total, arranges payment directly, and records the sale.
  */
-const inStock = products.filter((p) => p.status === "In Stock");
+const inStock = skus.filter((s) => s.status === "In Stock");
+const money = (cents: number) => usd(cents / 100);
+
+export const FULFIL_OPTIONS = [
+  ["pickup", "Local pickup", "Hot Springs area — we'll arrange a time"],
+  ["delivery", "Local delivery", "Hot Springs area — we'll confirm the details"],
+] as const;
+type Fulfil = (typeof FULFIL_OPTIONS)[number][0];
 
 interface Line {
   slug: string;
@@ -20,7 +28,7 @@ interface Line {
 
 export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) {
   const { referral, referralCaptured } = usePortal();
-  const firstSlug = getProductBySlug(initialProduct)?.status === "In Stock" ? initialProduct : (inStock[0]?.slug ?? "");
+  const firstSlug = getSku(initialProduct)?.status === "In Stock" ? initialProduct : (inStock[0]?.sku ?? "");
   const [lines, setLines] = useState<Line[]>([{ slug: firstSlug, quantity: 1 }]);
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -28,7 +36,7 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
   const [phone, setPhone] = useState("");
   const [payment, setPayment] = useState("");
   const [paymentOther, setPaymentOther] = useState("");
-  const [fulfil, setFulfil] = useState<"ship" | "pickup">("ship");
+  const [fulfil, setFulfil] = useState<Fulfil>("pickup");
   const [notes, setNotes] = useState("");
   const [ack, setAck] = useState(false);
   const [code, setCode] = useState("");
@@ -44,6 +52,14 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
   const setLine = (i: number, patch: Partial<Line>) =>
     setLines((ls) => ls.map((l, j) => (j === i ? { ...l, ...patch } : l)));
   const usedSlugs = new Set(lines.map((l) => l.slug));
+  const estimate = lines.reduce(
+    (acc, l) => {
+      const c = priceCents(l.slug, l.quantity);
+      return c == null ? { ...acc, quoted: true } : { ...acc, cents: acc.cents + c };
+    },
+    { cents: 0, quoted: false },
+  );
+  const fulfilLabel = FULFIL_OPTIONS.find(([v]) => v === fulfil)?.[1] ?? "";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,12 +68,14 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
     if (payment === "other" && !paymentOther.trim()) return setError("Tell us which payment method you'd like to use.");
     if (!ack) return setError("Please confirm the research-use statement.");
     const items = lines
-      .map((l) => ({ l, p: getProductBySlug(l.slug) }))
-      .filter((x) => x.p)
-      .map(({ l, p }) => ({ slug: p!.slug, name: `${p!.name} ${p!.strength}`, quantity: l.quantity }));
+      .map((l) => ({ l, s: getSku(l.slug) }))
+      .filter((x) => x.s)
+      .map(({ l, s }) => ({ slug: s!.sku, name: s!.label, quantity: l.quantity, est_cents: priceCents(s!.sku, l.quantity) }));
     if (items.length === 0) return setError("Add at least one product.");
     const effectiveCode = referralCaptured ? referral : code.trim().toUpperCase();
-    const summary = items.map((i) => `${i.quantity} × ${i.name}`).join("\n");
+    const summary = items
+      .map((i) => `${i.quantity} × ${i.name}${i.est_cents != null ? ` — est. ${money(i.est_cents)}` : " — quote needed"}`)
+      .join("\n");
     const payLabel = PAYMENT_METHODS.find((m) => m.value === payment)?.label ?? payment;
     setBusy(true);
     try {
@@ -81,7 +99,8 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
             "Order request:",
             summary,
             `Payment: ${payLabel}${payment === "other" ? " (" + paymentOther.trim() + ")" : ""}`,
-            `Fulfilment: ${fulfil === "pickup" ? "Local pickup" : "Ship"}`,
+            estimate.cents > 0 ? `Estimated total: ${money(estimate.cents)}${estimate.quoted ? " + items to quote" : ""}` : "",
+            `Fulfilment: ${fulfilLabel}`,
             notes.trim() ? "Notes: " + notes.trim() : "",
           ]
             .filter(Boolean)
@@ -108,7 +127,7 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
         <p className="mt-4 text-sm leading-relaxed text-foreground/75">
           Your request <strong>#{done}</strong> is with our team. We'll confirm availability and your
           total, then contact you by phone or email to arrange {PAYMENT_METHODS.find((m) => m.value === payment)?.label}
-          {fulfil === "pickup" ? " and local pickup" : " and shipping"}. Nothing has been charged, and
+          {fulfil === "pickup" ? " and a pickup time" : " and local delivery"}. Nothing has been charged, and
           nothing is final until we confirm it with you.
         </p>
       </div>
@@ -135,8 +154,8 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
                 onChange={(e) => setLine(i, { slug: e.target.value })}
               >
                 {inStock.map((p) => (
-                  <option key={p.slug} value={p.slug} disabled={p.slug !== l.slug && usedSlugs.has(p.slug)}>
-                    {p.name} — {p.strength}
+                  <option key={p.sku} value={p.sku} disabled={p.sku !== l.slug && usedSlugs.has(p.sku)}>
+                    {`${p.name} — ${p.strength}${p.prices ? ` · from $${p.prices[0]}` : ""}`}
                   </option>
                 ))}
               </select>
@@ -170,6 +189,12 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
                   <Plus className="size-4" />
                 </button>
               </div>
+              <span className="min-w-[5.5rem] text-right text-sm tabular-nums text-primary" aria-live="polite">
+                {(() => {
+                  const c = priceCents(l.slug, l.quantity);
+                  return c != null ? money(c) : l.quantity > MAX_PRICED_QTY ? "We'll quote" : "—";
+                })()}
+              </span>
               {lines.length > 1 && (
                 <button
                   type="button"
@@ -187,12 +212,22 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
               type="button"
               className={outline + " w-fit"}
               onClick={() =>
-                setLines((ls) => [...ls, { slug: inStock.find((p) => !usedSlugs.has(p.slug))?.slug ?? inStock[0].slug, quantity: 1 }])
+                setLines((ls) => [...ls, { slug: inStock.find((p) => !usedSlugs.has(p.sku))?.sku ?? inStock[0].sku, quantity: 1 }])
               }
             >
               <Plus className="size-4" /> Add another product
             </button>
           )}
+          <div className="mt-1 flex flex-wrap items-baseline justify-between gap-2 border-t border-border pt-3">
+            <span className="text-sm text-muted-foreground">
+              Estimated total{estimate.quoted ? " (plus items we'll quote)" : ""}
+            </span>
+            <span className="font-serif text-2xl text-primary tabular-nums">{money(estimate.cents)}</span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Prices cover 1–{MAX_PRICED_QTY} vials of each item. For larger quantities we'll confirm your price. Your
+            final total is confirmed by our team before you pay.
+          </p>
         </fieldset>
 
         <fieldset>
@@ -231,14 +266,9 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
         </fieldset>
 
         <fieldset>
-          <legend className="mb-3 text-sm font-medium text-primary">Shipping or pickup</legend>
+          <legend className="mb-3 text-sm font-medium text-primary">Pickup or local delivery</legend>
           <div className="grid gap-2 sm:grid-cols-2">
-            {(
-              [
-                ["ship", "Ship to me", "USPS with tracking, US only"],
-                ["pickup", "Local pickup", "Arkansas — we'll arrange a time"],
-              ] as const
-            ).map(([v, label, sub]) => (
+            {FULFIL_OPTIONS.map(([v, label, sub]) => (
               <label
                 key={v}
                 className={

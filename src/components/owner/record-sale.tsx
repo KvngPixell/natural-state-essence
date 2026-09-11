@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Plus, Search, X } from "lucide-react";
-import { products, getProductBySlug } from "@/data/products";
+import { products, skus, getSku, priceCents } from "@/data/products";
 import {
-  rpc, money, pct, fmtDate, field, button, outline, toCents, todayISO, errorText, PAYMENT_METHODS,
+  rpc, money, pct, fmtDate, field, button, outline, toCents, centsToInput, todayISO, errorText, PAYMENT_METHODS,
 } from "@/lib/backend";
 import type { Ambassador, CustomerSummary, OrderRecord, RequestRecord } from "@/lib/program-types";
 import { Modal, Notice, Pill } from "@/components/program-ui";
@@ -19,22 +19,28 @@ interface Line {
   quantity: number;
   amount: string; // optional line amount (dollars)
   giveaway: boolean;
+  /** True while the amount is the list price; typing an amount turns it off. */
+  auto: boolean;
 }
 
-const blankLine = (): Line => ({ slug: "", name: "", quantity: 1, amount: "", giveaway: false });
+const blankLine = (): Line => ({ slug: "", name: "", quantity: 1, amount: "", giveaway: false, auto: true });
+const listAmount = (slug: string, qty: number) => {
+  const c = priceCents(slug, qty);
+  return c == null ? "" : centsToInput(c);
+};
 const small = "w-full min-w-0 rounded-lg border border-border bg-background px-3 py-2.5 text-base outline-none focus:border-accent";
 
 function linesFromRequest(r: RequestRecord | undefined): Line[] {
   if (!r) return [blankLine()];
   if (r.order_items?.length) {
     return r.order_items.map((i) => {
-      const p = i.slug ? getProductBySlug(i.slug) : undefined;
-      return { slug: p?.slug ?? "", name: p ? "" : i.name, quantity: i.quantity, amount: "", giveaway: false };
+      const s = getSku(i.slug);
+      return { slug: s?.sku ?? "", name: s ? "" : i.name, quantity: i.quantity, amount: s ? listAmount(s.sku, i.quantity) : "", giveaway: false, auto: true };
     });
   }
   if (r.product) {
     const p = products.find((x) => r.product?.startsWith(x.name));
-    return [{ slug: p?.slug ?? "", name: p ? "" : r.product, quantity: 1, amount: "", giveaway: false }];
+    return [{ slug: p?.slug ?? "", name: p ? "" : r.product, quantity: 1, amount: p ? listAmount(p.slug, 1) : "", giveaway: false, auto: true }];
   }
   return [blankLine()];
 }
@@ -161,11 +167,11 @@ export function RecordSale({
     const items = lines
       .filter((l) => l.slug || l.name.trim())
       .map((l) => {
-        const p = l.slug ? getProductBySlug(l.slug) : undefined;
+        const p = getSku(l.slug);
         const amt = l.amount.trim() ? toCents(l.amount) : null;
         return {
-          product_slug: p?.slug ?? null,
-          product_name: p ? `${p.name} ${p.strength}` : l.name.trim(),
+          product_slug: p?.sku ?? null,
+          product_name: p ? p.label : l.name.trim(),
           quantity: l.quantity,
           line_cents: amt,
           giveaway: l.giveaway,
@@ -239,7 +245,19 @@ export function RecordSale({
     }
   }
 
-  const setLine = (i: number, patch: Partial<Line>) => setLines((ls) => ls.map((l, j) => (j === i ? { ...l, ...patch } : l)));
+  const setLine = (i: number, patch: Partial<Line>) =>
+    setLines((ls) =>
+      ls.map((l, j) => {
+        if (j !== i) return l;
+        const next = { ...l, ...patch };
+        // Keep the list price in step with product/quantity until the owner types their own amount.
+        if (next.auto && ("slug" in patch || "quantity" in patch)) next.amount = listAmount(next.slug, next.quantity);
+        return next;
+      }),
+    );
+  const linesTotal = lines.every((l) => l.giveaway || l.amount.trim())
+    ? lines.reduce((a, l) => a + (l.giveaway ? 0 : (toCents(l.amount) ?? 0)), 0)
+    : null;
 
   // ---- success -----------------------------------------------------------
   if (saved) {
@@ -348,9 +366,9 @@ export function RecordSale({
                 <select className={small + " flex-1"} value={l.slug || (l.name ? "__other" : "")} aria-label={`Product ${i + 1}`}
                   onChange={(e) => setLine(i, e.target.value === "__other" ? { slug: "", name: l.name || " " } : { slug: e.target.value, name: "" })}>
                   <option value="">Choose product…</option>
-                  {products.map((p) => (
-                    <option key={p.slug} value={p.slug}>
-                      {p.name} — {p.strength}
+                  {skus.map((p) => (
+                    <option key={p.sku} value={p.sku}>
+                      {`${p.label}${p.status !== "In Stock" ? " (coming soon)" : ""}`}
                     </option>
                   ))}
                   <option value="__other">Other (type name)</option>
@@ -375,8 +393,9 @@ export function RecordSale({
                     }} />
                 </label>
                 <label className="grid gap-1 text-xs text-muted-foreground">
-                  Line amount (optional)
-                  <input className={small} inputMode="decimal" placeholder="$" value={l.amount} onChange={(e) => setLine(i, { amount: e.target.value })} />
+                  {l.auto && l.amount ? "Line amount (list price)" : "Line amount (optional)"}
+                  <input className={small} inputMode="decimal" placeholder={l.slug && l.quantity > 3 ? "Quote" : "$"} value={l.amount}
+                    onChange={(e) => setLine(i, { amount: e.target.value, auto: false })} />
                 </label>
               </div>
               <label className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -392,14 +411,19 @@ export function RecordSale({
             <label className="grid gap-1 text-sm">
               Amount paid for products
               <input className={field} inputMode="decimal" placeholder="$0.00" value={paid} onChange={(e) => setPaid(e.target.value)} />
-              <span className="text-xs text-muted-foreground">After discounts. Exclude shipping and tax.</span>
+              <span className="text-xs text-muted-foreground">After discounts. Exclude delivery fees and tax.</span>
+              {linesTotal != null && linesTotal > 0 && toCents(paid) !== linesTotal && (
+                <button type="button" className="w-fit text-xs text-primary underline" onClick={() => setPaid(centsToInput(linesTotal))}>
+                  Use line total ({money(linesTotal)})
+                </button>
+              )}
             </label>
             <label className="grid gap-1 text-sm">
               Discount given
               <input className={field} inputMode="decimal" placeholder="$0" value={discount} onChange={(e) => setDiscount(e.target.value)} />
             </label>
             <label className="grid gap-1 text-sm">
-              Shipping charged
+              Delivery fee charged
               <input className={field} inputMode="decimal" placeholder="$0" value={shipping} onChange={(e) => setShipping(e.target.value)} />
             </label>
           </div>
@@ -434,11 +458,12 @@ export function RecordSale({
           {showMore && (
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="grid gap-1 text-sm">
-                Shipping / pickup
+                Pickup / delivery
                 <select className={field} value={fulfilMethod} onChange={(e) => setFulfilMethod(e.target.value)}>
                   <option value="">—</option>
-                  <option value="ship">Ship</option>
                   <option value="pickup">Local pickup</option>
+                  <option value="delivery">Local delivery</option>
+                  <option value="ship">Shipped</option>
                 </select>
               </label>
               <label className="grid gap-1 text-sm">

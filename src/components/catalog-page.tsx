@@ -47,7 +47,8 @@ export function CatalogPage() {
     let list = products.filter((p) => {
       const normalize = (v: string) => v.toLowerCase().replace(/[^a-z0-9]/g, "");
       const q = normalize(query);
-      const aliases = p.slug === "epitalon" ? "epithalon" : p.slug === "cjc-1295-no-dac-ipamorelin" ? "cjcipacjc1295ipamorelin" : "";
+      const aliases =
+        p.slug === "epitalon" ? "epithalon" : p.slug === "cjc-1295-no-dac-ipamorelin" ? "cjcipacjc1295ipamorelin" : p.slug === "retatrutide" ? "reta" : "";
       const matchesQuery =
         !q ||
         normalize(p.name).includes(q) || (!!q && aliases.includes(q)) ||
@@ -63,6 +64,14 @@ export function CatalogPage() {
     list = [...list].sort((a, b) => {
       if (sort === "name-asc") return a.name.localeCompare(b.name);
       if (sort === "name-desc") return b.name.localeCompare(a.name);
+      // Unpriced items sort last either way.
+      if (sort === "price-asc" || sort === "price-desc") {
+        const pa = a.fromPrice ?? Infinity;
+        const pb = b.fromPrice ?? Infinity;
+        if (pa === pb) return a.sortOrder - b.sortOrder;
+        if (pa === Infinity || pb === Infinity) return pa === Infinity ? 1 : -1;
+        return sort === "price-asc" ? pa - pb : pb - pa;
+      }
       return a.sortOrder - b.sortOrder;
     });
 
@@ -197,6 +206,8 @@ export function CatalogPage() {
               <option value="default">Sort: Featured order</option>
               <option value="name-asc">Name: A–Z</option>
               <option value="name-desc">Name: Z–A</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
             </select>
           </div>
         </div>

@@ -96,7 +96,7 @@ function Ambassador() {
           </div>
         </div>
         <p className="mt-6 text-xs text-muted-foreground">
-          Commission is paid on product amounts actually received — not shipping, tax, discounts,
+          Commission is paid on product amounts actually received — not delivery fees, tax, discounts,
           refunds, your own purchases, or clicks. Earnings depend entirely on real sales; we make no
           income promises.
         </p>
