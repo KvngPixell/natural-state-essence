@@ -7,6 +7,7 @@ import { ContactCta } from "@/components/contact-cta";
 import { ProductVial } from "@/components/product-vial";
 import { StatusBadge } from "@/components/status-badge";
 import { ProductSchema } from "@/components/structured-data";
+import { AvailabilityNotify } from "@/components/availability-notify";
 
 const badges = [
   { icon: FlaskConical, label: "Research Use Only" },
@@ -48,10 +49,7 @@ function ProductDetail() {
 
   const sections = [
     { title: "Product Overview", body: product.longDescription },
-    {
-      title: "Research Information",
-      body: "Research information for this compound is published as it is verified. Handling notes and references are added here as documentation is finalised.",
-    },
+    { title: "Research Information", body: product.researchNotes },
     { title: "Testing & Documentation", body: product.testingStatus },
     { title: "Storage Information", body: product.storage },
   ];
@@ -133,6 +131,8 @@ function ProductDetail() {
             </div>
           ))}
         </div>
+
+        {product.status === "Coming Soon" && <AvailabilityNotify product={product} />}
 
         <div className="mt-16 rounded-lg border border-border bg-secondary/50 p-7">
           <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Disclaimer</p>

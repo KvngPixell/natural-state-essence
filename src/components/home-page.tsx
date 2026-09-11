@@ -93,11 +93,14 @@ export function HomePage() {
           </div>
           {/* Floats on the page rather than sitting in a card: the artwork carries
               its own gold frame, so a second border around it reads as a sticker. */}
-          <div className="hidden justify-center lg:flex">
+          {/* Visible at every width. QR traffic lands on phones, and hiding the
+              single most distinctive asset from most first-time visitors would
+              waste it. Scales down rather than disappearing. */}
+          <div className="flex justify-center">
             <img
               src={arkansasHero}
               alt="The state of Arkansas rendered as a gold-framed window onto a sunrise over forested ridges and a river"
-              className="w-full max-w-[26rem] drop-shadow-[0_24px_40px_rgba(8,39,25,0.22)]"
+              className="w-full max-w-[15rem] drop-shadow-[0_24px_40px_rgba(8,39,25,0.22)] sm:max-w-[19rem] lg:max-w-[26rem]"
               width={900}
               height={1139}
               loading="eager"
