@@ -3,7 +3,7 @@ import { SimplePage } from "@/components/simple-page";
 
 const title = "Terms — Natural State Peptides";
 const description =
-  "Terms of use for Natural State Peptides: research-use-only scope, no medical or human-use claims, ambassador program terms, and limitation of liability.";
+  "Terms of use for Natural State Peptides: research-use-only scope, order requests, ambassador program and commission terms, and limitation of liability.";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -33,10 +33,11 @@ const sections: [string, string[]][] = [
     ],
   ],
   [
-    "3. Inquiries and availability",
+    "3. Inquiries, order requests and availability",
     [
-      "This site currently operates as a product-information and inquiry platform. Submitting an inquiry, COA request, or availability request does not create a binding order or sale. Any transaction discussed after an inquiry is handled directly between you and Natural State Peptides outside of this website, subject to separately confirmed terms.",
-      "Product availability, specifications, and documentation are subject to change without notice.",
+      "This site is a product-information and request platform. Submitting an inquiry, an order request (the \u201cPlace Order\u201d form), a COA request, or an availability request tells our team what you would like and how you prefer to pay; it does not create a binding order or sale, and no payment is taken on this site.",
+      "Our team will contact you to confirm availability, the total, and payment and delivery details. A sale is complete only once we have confirmed it with you and received payment by the agreed method (such as cash, Cash App, Venmo, crypto or another method we accept). We may decline any request.",
+      "Product availability, pricing, specifications, and documentation are subject to change without notice.",
     ],
   ],
   [
@@ -64,8 +65,13 @@ const sections: [string, string[]][] = [
   [
     "7. Ambassador program",
     [
-      "Participation in the Natural State Ambassador program is by approval only and is governed by the individual commission, payout, and conduct terms provided to each approved ambassador at the time of acceptance. Those individual terms control in the event of any conflict with this page.",
-      "Ambassadors must comply with the Natural State Ambassador Copy Guide, disclose their financial relationship near any endorsement, and must not make human-use, dosing, or therapeutic claims on Natural State's behalf.",
+      "Participation in the Natural State Ambassador program is by approval only. Approved ambassadors receive a personal referral link and code and a private dashboard. The specific commission rates, rank thresholds, residual period and payout timing in effect are shown in the ambassador dashboard and confirmed at approval; any individual written terms control in the event of a conflict with this page.",
+      "Attribution. A customer is credited to an ambassador when they arrive through that ambassador's referral link within the referral window, or when the ambassador's code is provided with their request or purchase. A customer is treated as a new customer only once; after their first purchase they remain attributed to the same ambassador, and repeat purchases may earn a residual commission for the residual period. Attribution is determined from our records, and Natural State may correct attribution in cases of error, duplicate records, or abuse.",
+      "Commission basis. Commission is calculated only on recorded, paid product amounts actually received, after discounts. Shipping, taxes, fees, refunded or cancelled amounts, disputed payments, excluded products, and purchases by an ambassador for themselves or their own household do not earn commission. Clicks, visits and inquiries do not earn commission on their own.",
+      "Monthly statements. Rank is determined by an ambassador's total qualified revenue in a calendar month (Central time), and the rank reached applies to all new-customer sales in that month. Commission for a month is finalized after the month closes and is approved by Natural State before payment. Refunds or chargebacks after payment may be deducted from later commission.",
+      "Payouts are made outside this site by the method agreed with the ambassador and are recorded in the dashboard. Ambassadors are independent participants, not employees, and are responsible for their own taxes. We may request tax information before paying commission.",
+      "Conduct. Ambassadors must follow the Natural State brand guidance, clearly disclose their financial relationship near any endorsement, and must not make human-use, dosing, therapeutic, or income claims, send spam, create fake reviews, or refer themselves. Natural State may suspend or end participation, and withhold commission connected to a violation, at its discretion.",
+      "Natural State may change program rules going forward. Changes do not reduce commission already approved or paid.",
     ],
   ],
   [
@@ -122,7 +128,7 @@ function Terms() {
         </div>
       ))}
       <p className="pt-6 text-sm text-muted-foreground">
-        Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}.
+        Last updated: September 11, 2026.
       </p>
     </SimplePage>
   );

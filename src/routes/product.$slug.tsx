@@ -8,6 +8,7 @@ import { ProductVial } from "@/components/product-vial";
 import { StatusBadge } from "@/components/status-badge";
 import { ProductSchema } from "@/components/structured-data";
 import { AvailabilityNotify } from "@/components/availability-notify";
+import { OrderForm } from "@/components/order-form";
 
 const badges = [
   { icon: FlaskConical, label: "Research Use Only" },
@@ -95,10 +96,22 @@ function ProductDetail() {
               </ul>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                {product.status === "In Stock" && (
+                  <a
+                    href="#order"
+                    className="inline-flex justify-center rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
+                  >
+                    Place Order
+                  </a>
+                )}
                 <Link
                   to="/contact"
                   search={{ product: product.slug, intent: "product" }}
-                  className="inline-flex justify-center rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
+                  className={
+                    product.status === "In Stock"
+                      ? "inline-flex justify-center rounded-md border border-primary/25 px-7 py-3.5 text-sm text-primary transition-colors hover:border-accent"
+                      : "inline-flex justify-center rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
+                  }
                 >
                   {product.status === "Coming Soon"
                     ? "Ask About Availability"
@@ -133,6 +146,11 @@ function ProductDetail() {
         </div>
 
         {product.status === "Coming Soon" && <AvailabilityNotify product={product} />}
+        {product.status === "In Stock" && (
+          <div className="mt-16">
+            <OrderForm initialProduct={product.slug} />
+          </div>
+        )}
 
         <div className="mt-16 rounded-lg border border-border bg-secondary/50 p-7">
           <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Disclaimer</p>

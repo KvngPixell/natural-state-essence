@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Product } from "@/data/products";
 import { usePortal } from "@/components/portal-context";
 import { backendReady, edge, field, button } from "@/lib/backend";
+import { visitorId } from "@/lib/referral";
 
 /**
  * Compact capture for Coming Soon products. Without this, a Coming Soon page is
@@ -10,7 +11,7 @@ import { backendReady, edge, field, button } from "@/lib/backend";
  * "availability" request so these are filterable in owner controls.
  */
 export function AvailabilityNotify({ product }: { product: Product }) {
-  const { referral } = usePortal();
+  const { referral, referralCaptured } = usePortal();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
@@ -31,10 +32,14 @@ export function AvailabilityNotify({ product }: { product: Product }) {
           id: crypto.randomUUID(),
           kind: "availability",
           name: name.trim(),
+          first_name: name.trim().split(/\s+/)[0] ?? name.trim(),
+          last_name: name.trim().split(/\s+/).slice(1).join(" ") || null,
           email: email.trim(),
           product: `${product.name} ${product.strength}`,
           message: `Please let me know when ${product.name} ${product.strength} becomes available.`,
-          referral_code: referral.toUpperCase().trim(),
+          referral_code: referral.toUpperCase().trim() || null,
+          referral_captured: referralCaptured,
+          visitor_id: visitorId() || null,
           website,
         },
       });

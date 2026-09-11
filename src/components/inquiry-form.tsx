@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { products, getProductBySlug } from "@/data/products";
 import { FACEBOOK_URL } from "@/components/site-footer";
 import { usePortal } from "@/components/portal-context";
-import { backendReady, edge, field, button, outline } from "@/lib/backend";
+import { backendReady, edge, field, button, outline, errorText } from "@/lib/backend";
+import { checkCode, visitorId } from "@/lib/referral";
+
 export function InquiryForm({
   initialProduct = "",
   initialKind = "product",
@@ -10,14 +12,19 @@ export function InquiryForm({
   initialProduct?: string;
   initialKind?: string;
 }) {
-  const { referral } = usePortal();
+  const { referral, referralCaptured } = usePortal();
   const [product, setProduct] = useState(initialProduct);
   const [kind, setKind] = useState(initialKind);
-  const [name, setName] = useState("");
+  const [first, setFirst] = useState("");
+  const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
   const [lot, setLot] = useState("");
   const [message, setMessage] = useState("");
-  const [code, setCode] = useState(referral);
+  const [code, setCode] = useState("");
+  const [codeState, setCodeState] = useState<"" | "checking" | "valid" | "invalid">("");
   const [website, setWebsite] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
@@ -31,10 +38,21 @@ export function InquiryForm({
     setStatus("");
     setRequestId("");
   }, [initialProduct, initialKind]);
-  useEffect(() => {
-    setCode(referral);
-  }, [referral]);
+
+  // A referral captured from a link is attached invisibly; the manual field
+  // is only shown to visitors who were referred offline.
+  const showCodeField = !referralCaptured;
+  const effectiveCode = referralCaptured ? referral : code.trim().toUpperCase();
+
+  async function validateCode() {
+    const c = code.trim();
+    if (!c) return setCodeState("");
+    setCodeState("checking");
+    setCodeState((await checkCode(c)) ? "valid" : "invalid");
+  }
+
   const p = getProductBySlug(product);
+  const name = [first.trim(), last.trim()].filter(Boolean).join(" ");
   const draft = [
     "Hello Natural State Peptides.",
     kind === "coa"
@@ -44,13 +62,15 @@ export function InquiryForm({
         : "I'd like product information and availability.",
     p ? p.name + " — " + p.strength : "",
     kind === "coa" && lot ? "Lot: " + lot : "",
-    code ? "Referral: " + code : "",
+    effectiveCode ? "Referral: " + effectiveCode : "",
     name ? "Name: " + name : "",
     email ? "Reply: " + email : "",
+    phone ? "Phone: " + phone : "",
     message,
   ]
     .filter(Boolean)
     .join("\n\n");
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -63,21 +83,26 @@ export function InquiryForm({
         request: {
           id,
           kind,
-          name: name.trim(),
+          first_name: first.trim(),
+          last_name: last.trim() || null,
+          name,
           email: email.trim(),
+          phone: phone.trim() || null,
+          city: kind === "application" ? city.trim() || null : null,
+          state: kind === "application" ? state.trim() || null : null,
           product: p ? p.name + " " + p.strength : null,
           lot: kind === "coa" ? lot : null,
           message: message.trim() || draft,
-          referral_code: code.toUpperCase().trim(),
+          referral_code: effectiveCode || null,
+          referral_captured: referralCaptured,
+          visitor_id: visitorId() || null,
           website,
         },
       });
       setSent(true);
-      setStatus(
-        "Request received. Reference: " + result.id + ". Your request is saved for our team.",
-      );
-    } catch (e) {
-      setStatus(e instanceof Error ? e.message : "Could not send. Please try again.");
+      setStatus("Request received. Reference: " + result.id + ". Your request is saved for our team.");
+    } catch (err) {
+      setStatus(errorText(err) || "Could not send. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -103,14 +128,24 @@ export function InquiryForm({
       >
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="grid gap-2 text-sm">
-            Your name
+            First name
             <input
               required={backendReady}
-              maxLength={100}
-              autoComplete="name"
+              maxLength={60}
+              autoComplete="given-name"
               className={field}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={first}
+              onChange={(e) => setFirst(e.target.value)}
+            />
+          </label>
+          <label className="grid gap-2 text-sm">
+            Last name
+            <input
+              maxLength={60}
+              autoComplete="family-name"
+              className={field}
+              value={last}
+              onChange={(e) => setLast(e.target.value)}
             />
           </label>
           <label className="grid gap-2 text-sm">
@@ -125,6 +160,18 @@ export function InquiryForm({
               onChange={(e) => setEmail(e.target.value)}
             />
           </label>
+          <label className="grid gap-2 text-sm">
+            Phone {kind === "application" ? "" : "(optional)"}
+            <input
+              type="tel"
+              required={backendReady && kind === "application"}
+              maxLength={40}
+              autoComplete="tel"
+              className={field}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </label>
         </div>
         <label className="grid gap-2 text-sm">
           Inquiry type
@@ -135,6 +182,30 @@ export function InquiryForm({
             <option value="availability">Availability inquiry</option>
           </select>
         </label>
+        {kind === "application" && (
+          <div className="grid gap-5 sm:grid-cols-[1fr_8rem]">
+            <label className="grid gap-2 text-sm">
+              City
+              <input
+                maxLength={80}
+                autoComplete="address-level2"
+                className={field}
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
+            </label>
+            <label className="grid gap-2 text-sm">
+              State
+              <input
+                maxLength={40}
+                autoComplete="address-level1"
+                className={field}
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+              />
+            </label>
+          </div>
+        )}
         {kind !== "application" && (
           <label className="grid gap-2 text-sm">
             Product
@@ -148,9 +219,9 @@ export function InquiryForm({
               }}
             >
               <option value="">Select a product (optional)</option>
-              {products.map((p) => (
-                <option key={p.slug} value={p.slug}>
-                  {p.name} — {p.strength}
+              {products.map((x) => (
+                <option key={x.slug} value={x.slug}>
+                  {x.name} — {x.strength}
                 </option>
               ))}
             </select>
@@ -159,12 +230,7 @@ export function InquiryForm({
         {kind === "coa" && (
           <label className="grid gap-2 text-sm">
             Lot reference, if available
-            <input
-              className={field}
-              maxLength={100}
-              value={lot}
-              onChange={(e) => setLot(e.target.value)}
-            />
+            <input className={field} maxLength={100} value={lot} onChange={(e) => setLot(e.target.value)} />
           </label>
         )}
         <label className="grid gap-2 text-sm">
@@ -180,25 +246,32 @@ export function InquiryForm({
             onChange={(e) => setMessage(e.target.value)}
           />
         </label>
-        <label className="grid gap-2 text-sm">
-          Referral code (optional)
-          <input
-            className={field}
-            maxLength={32}
-            pattern="[A-Za-z0-9_-]*"
-            value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
-          />
-        </label>
+        {showCodeField && (
+          <label className="grid gap-2 text-sm">
+            Referral code (optional)
+            <input
+              className={field}
+              maxLength={32}
+              pattern="[A-Za-z0-9_-]*"
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value.toUpperCase());
+                setCodeState("");
+              }}
+              onBlur={() => void validateCode()}
+            />
+            {codeState === "valid" && <span className="text-xs text-primary">Referral code applied.</span>}
+            {codeState === "invalid" && (
+              <span className="text-xs text-destructive">
+                We couldn't find that code. Check it with the person who referred you, or leave it blank.
+              </span>
+            )}
+          </label>
+        )}
         <div className="hidden" aria-hidden="true">
           <label>
             Website
-            <input
-              tabIndex={-1}
-              autoComplete="off"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-            />
+            <input tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
           </label>
         </div>
         {backendReady && (

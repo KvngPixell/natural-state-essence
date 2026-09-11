@@ -15,6 +15,8 @@ import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as QualityRouteImport } from './routes/quality'
+import { Route as OwnerRouteImport } from './routes/owner'
+import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminAmbassadorsRouteImport } from './routes/admin.ambassadors'
 import { Route as AdminPartnersRouteImport } from './routes/admin.partners'
@@ -55,6 +57,16 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const QualityRoute = QualityRouteImport.update({
   id: '/quality',
   path: '/quality',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerRoute = OwnerRouteImport.update({
+  id: '/owner',
+  path: '/owner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RCodeRoute = RCodeRouteImport.update({
+  id: '/r/$code',
+  path: '/r/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -138,6 +150,8 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
+  '/owner': typeof OwnerRoute
+  '/r/$code': typeof RCodeRoute
   '/terms': typeof TermsRoute
   '/admin/ambassadors': typeof AdminAmbassadorsRoute
   '/admin/partners': typeof AdminPartnersRoute
@@ -156,6 +170,8 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
+  '/owner': typeof OwnerRoute
+  '/r/$code': typeof RCodeRoute
   '/terms': typeof TermsRoute
   '/admin/ambassadors': typeof AdminAmbassadorsRoute
   '/admin/partners': typeof AdminPartnersRoute
@@ -176,6 +192,8 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
+  '/owner': typeof OwnerRoute
+  '/r/$code': typeof RCodeRoute
   '/terms': typeof TermsRoute
   '/admin/ambassadors': typeof AdminAmbassadorsRoute
   '/admin/partners': typeof AdminPartnersRoute
@@ -197,6 +215,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/quality'
+    | '/owner'
+    | '/r/$code'
     | '/terms'
     | '/admin/ambassadors'
     | '/admin/partners'
@@ -215,6 +235,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/quality'
+    | '/owner'
+    | '/r/$code'
     | '/terms'
     | '/admin/ambassadors'
     | '/admin/partners'
@@ -234,6 +256,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/quality'
+    | '/owner'
+    | '/r/$code'
     | '/terms'
     | '/admin/ambassadors'
     | '/admin/partners'
@@ -254,6 +278,8 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
   QualityRoute: typeof QualityRoute
+  OwnerRoute: typeof OwnerRoute
+  RCodeRoute: typeof RCodeRoute
   TermsRoute: typeof TermsRoute
   AdminAmbassadorsRoute: typeof AdminAmbassadorsRoute
   AdminPartnersRoute: typeof AdminPartnersRoute
@@ -305,6 +331,20 @@ declare module '@tanstack/react-router' {
       path: '/quality'
       fullPath: '/quality'
       preLoaderRoute: typeof QualityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner': {
+      id: '/owner'
+      path: '/owner'
+      fullPath: '/owner'
+      preLoaderRoute: typeof OwnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/r/$code': {
+      id: '/r/$code'
+      path: '/r/$code'
+      fullPath: '/r/$code'
+      preLoaderRoute: typeof RCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -394,6 +434,8 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
   QualityRoute: QualityRoute,
+  OwnerRoute: OwnerRoute,
+  RCodeRoute: RCodeRoute,
   TermsRoute: TermsRoute,
   AdminAmbassadorsRoute: AdminAmbassadorsRoute,
   AdminPartnersRoute: AdminPartnersRoute,

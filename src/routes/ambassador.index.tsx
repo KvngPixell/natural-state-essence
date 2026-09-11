@@ -8,7 +8,7 @@ export const Route = createFileRoute("/ambassador/")({
       {
         name: "description",
         content:
-          "Become a Natural State Ambassador. Approved ambassadors receive a personal referral code, a private dashboard, and a clear record of sales and commissions.",
+          "Become a Natural State Ambassador. Approved ambassadors receive a personal referral link, a private dashboard, and a clear record of attributed customers, sales, commissions and payouts.",
       },
     ],
   }),
@@ -44,14 +44,15 @@ function Ambassador() {
         <div className={panel + " self-center"}>
           <h2 className="font-serif text-3xl">What ambassadors receive</h2>
           <ul className="mt-6 space-y-3 text-sm text-muted-foreground">
-            <li>Personal referral link and code</li>
-            <li>Private account with recorded sales</li>
-            <li>Commission and payout history</li>
-            <li>Brand guidance and creative resources</li>
+            <li>A personal referral link, code and QR code to share</li>
+            <li>A private dashboard with your rank and progress for the month</li>
+            <li>Every recorded sale you're credited for, and the customers attributed to you</li>
+            <li>Monthly commission statements and a full payout history</li>
+            <li>Brand guidance and approved language</li>
           </ul>
           <p className="mt-6 text-xs">
-            Access is issued after approval. Individual commission and payout terms are confirmed
-            before participation.
+            Access is issued after approval. Commission rates and payout timing are confirmed with
+            you before you start.
           </p>
         </div>
       </div>
@@ -59,8 +60,8 @@ function Ambassador() {
         {[
           ["01", "Apply", "Share your public channels and proposed approach."],
           ["02", "Review", "The team reviews your application and confirms terms."],
-          ["03", "Receive access", "Use your personal code and private dashboard."],
-          ["04", "Track recorded sales", "View qualifying paid orders and commission history."],
+          ["03", "Share your link", "Customers who come through your link or code are credited to you."],
+          ["04", "Earn on recorded sales", "Paid orders are recorded by our team and appear in your dashboard."],
         ].map(([n, t, c]) => (
           <div className={panel} key={n}>
             <p className="text-accent">{n}</p>
@@ -68,6 +69,37 @@ function Ambassador() {
             <p className="mt-3 text-sm text-muted-foreground">{c}</p>
           </div>
         ))}
+      </div>
+      <div className={panel + " mb-12"}>
+        <h2 className="font-serif text-3xl">How commission works</h2>
+        <div className="mt-6 grid gap-6 text-sm text-muted-foreground md:grid-cols-3">
+          <div>
+            <h3 className="font-medium text-primary">New customers</h3>
+            <p className="mt-2">
+              When a first-time customer is introduced through your link or code, their first
+              purchase earns commission at your rank for that month.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-medium text-primary">Ranks that rise with you</h3>
+            <p className="mt-2">
+              Your rank is set by your total qualified sales in the calendar month. When you reach a
+              higher rank, it applies to every new-customer sale that month — not just the ones after.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-medium text-primary">Returning customers</h3>
+            <p className="mt-2">
+              Customers you introduce stay attributed to you, and their repeat orders earn a
+              residual commission for a set period that also counts toward your rank.
+            </p>
+          </div>
+        </div>
+        <p className="mt-6 text-xs text-muted-foreground">
+          Commission is paid on product amounts actually received — not shipping, tax, discounts,
+          refunds, your own purchases, or clicks. Earnings depend entirely on real sales; we make no
+          income promises.
+        </p>
       </div>
       <div id="apply" className="grid scroll-mt-24 gap-10 lg:grid-cols-2">
         <div>

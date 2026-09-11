@@ -42,3 +42,49 @@ export const button =
 export const outline =
   "inline-flex items-center justify-center gap-2 rounded-lg border border-primary/20 px-5 py-3 text-sm text-primary hover:bg-secondary disabled:opacity-50";
 export const panel = "rounded-2xl border border-border bg-card p-6 shadow-soft";
+
+/** "$1,234.56" or "1234.5" → cents. Returns null when not a valid amount. */
+export function toCents(input: string): number | null {
+  const s = input.replace(/[$,\s]/g, "");
+  if (!/^\d+(\.\d{1,2})?$/.test(s)) return null;
+  return Math.round(Number(s) * 100);
+}
+export const centsToInput = (cents: number | null | undefined) =>
+  cents == null ? "" : (cents / 100).toFixed(2).replace(/\.00$/, "");
+export const pct = (bps: number | null | undefined) =>
+  bps == null ? "—" : (bps / 100).toLocaleString("en-US", { maximumFractionDigits: 2 }) + "%";
+/** Dates from the database are plain YYYY-MM-DD; format without timezone drift. */
+export function fmtDate(d: string | null | undefined, opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", year: "numeric" }) {
+  if (!d) return "—";
+  const [y, m, day] = d.slice(0, 10).split("-").map(Number);
+  if (!y || !m || !day) return "—";
+  return new Date(Date.UTC(y, m - 1, day)).toLocaleDateString("en-US", { ...opts, timeZone: "UTC" });
+}
+export const fmtMonth = (d: string | null | undefined) => fmtDate(d, { month: "long", year: "numeric" });
+export function fmtDateTime(ts: string | null | undefined) {
+  if (!ts) return "—";
+  return new Date(ts).toLocaleString("en-US", {
+    month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/Chicago",
+  });
+}
+/** Today in the program time zone as YYYY-MM-DD. */
+export function todayISO() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(new Date());
+  return parts;
+}
+export function errorText(e: unknown) {
+  if (e instanceof Error) return e.message;
+  if (e && typeof e === "object" && "message" in e) return String((e as { message: unknown }).message);
+  return "Something went wrong. Please try again.";
+}
+export const PAYMENT_METHODS = [
+  { value: "cash", label: "Cash" },
+  { value: "cashapp", label: "Cash App" },
+  { value: "venmo", label: "Venmo" },
+  { value: "crypto", label: "Crypto" },
+  { value: "other", label: "Other" },
+] as const;
+export const paymentLabel = (v: string | null | undefined) =>
+  PAYMENT_METHODS.find((p) => p.value === v)?.label ?? "—";

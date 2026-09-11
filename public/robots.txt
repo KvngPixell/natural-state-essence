@@ -17,5 +17,6 @@ Disallow: /admin/
 Disallow: /ambassador/login
 Disallow: /ambassador/dashboard
 Disallow: /ambassador/reset
+Disallow: /r/
 
 Sitemap: /sitemap.xml
