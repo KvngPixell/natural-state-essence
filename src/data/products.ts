@@ -146,7 +146,7 @@ const seeds: Seed[] = [
     slug: "semax",
     strength: "10 mg",
     category: "Peptides",
-    status: "Coming Soon",
+    status: "In Stock",
     shortDescription:
       "Synthetic peptide researched for neurological signaling, cognition, stress response, and neuroprotective pathways.",
     researchNotes:

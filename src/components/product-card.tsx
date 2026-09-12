@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { getSku, usd, type Product } from "@/data/products";
+import { usd, type Product } from "@/data/products";
 import { AddButton } from "@/components/add-to-order";
 import { ProductVial } from "@/components/product-vial";
 import { StatusBadge } from "@/components/status-badge";
@@ -44,9 +44,7 @@ export function ProductCard({ product }: { product: Product }) {
           >
             View Product
           </Link>
-          {product.status === "In Stock" && product.variants.length === 1 && (
-            <AddButton sku={getSku(product.variants[0].sku)!} className="ml-auto" />
-          )}
+          {product.status === "In Stock" && <AddButton product={product} className="ml-auto" />}
         </div>
       </div>
     </article>

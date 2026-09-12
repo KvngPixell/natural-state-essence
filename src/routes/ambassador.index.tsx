@@ -30,7 +30,7 @@ export const Route = createFileRoute("/ambassador/")({
 
 const SHELL = "mx-auto w-full max-w-7xl px-5 sm:px-8";
 const CTA_BASE =
-  "inline-flex items-center justify-center gap-2.5 rounded-md px-8 py-4 text-[0.72rem] tracking-[0.18em] uppercase transition-colors";
+  "inline-flex items-center justify-center gap-2 rounded-md px-6 py-4 text-center text-[0.68rem] tracking-[0.12em] uppercase transition-colors sm:gap-2.5 sm:px-8 sm:text-[0.72rem] sm:tracking-[0.18em]";
 const CTA_LIGHT = CTA_BASE + " bg-primary text-primary-foreground hover:bg-forest/90";
 const CTA_ON_DARK = CTA_BASE + " bg-ivory text-forest hover:bg-gold";
 const EYEBROW_DARK = "text-[0.7rem] tracking-[0.24em] text-gold uppercase";
