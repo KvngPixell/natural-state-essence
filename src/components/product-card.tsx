@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { usd, type Product } from "@/data/products";
+import { getSku, usd, type Product } from "@/data/products";
+import { AddButton } from "@/components/add-to-order";
 import { ProductVial } from "@/components/product-vial";
 import { StatusBadge } from "@/components/status-badge";
 
@@ -35,13 +36,18 @@ export function ProductCard({ product }: { product: Product }) {
         <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground/75">
           {product.shortDescription}
         </p>
-        <Link
-          to="/product/$slug"
-          params={{ slug: product.slug }}
-          className="mt-6 inline-flex w-fit border-b border-accent/60 pb-1 text-sm text-primary transition-colors hover:text-accent"
-        >
-          View Product
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          <Link
+            to="/product/$slug"
+            params={{ slug: product.slug }}
+            className="inline-flex w-fit border-b border-accent/60 pb-1 text-sm text-primary transition-colors hover:text-accent"
+          >
+            View Product
+          </Link>
+          {product.status === "In Stock" && product.variants.length === 1 && (
+            <AddButton sku={getSku(product.variants[0].sku)!} className="ml-auto" />
+          )}
+        </div>
       </div>
     </article>
   );

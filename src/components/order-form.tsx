@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Minus, Plus, X } from "lucide-react";
 import { skus, getSku, priceCents, usd, MAX_PRICED_QTY } from "@/data/products";
 import { usePortal } from "@/components/portal-context";
+import { useCart } from "@/components/cart-context";
 import { backendReady, edge, field, button, outline, errorText, PAYMENT_METHODS } from "@/lib/backend";
 import { checkCode, visitorId } from "@/lib/referral";
 
@@ -26,10 +27,21 @@ interface Line {
   quantity: number;
 }
 
-export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) {
+export function OrderForm({
+  initialProduct = "",
+  cartMode = false,
+}: {
+  initialProduct?: string;
+  /** Read and write the shared cart instead of keeping local lines. */
+  cartMode?: boolean;
+}) {
   const { referral, referralCaptured } = usePortal();
+  const cart = useCart();
   const firstSlug = getSku(initialProduct)?.status === "In Stock" ? initialProduct : (inStock[0]?.sku ?? "");
-  const [lines, setLines] = useState<Line[]>([{ slug: firstSlug, quantity: 1 }]);
+  const [ownLines, setOwnLines] = useState<Line[]>([{ slug: firstSlug, quantity: 1 }]);
+  const lines: Line[] = cartMode ? cart.lines : ownLines;
+  const setLines = (update: Line[] | ((prev: Line[]) => Line[])) =>
+    cartMode ? cart.setLines(update) : setOwnLines(update);
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
@@ -48,11 +60,10 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
   const [requestId] = useState(() => (typeof crypto !== "undefined" ? crypto.randomUUID() : ""));
 
   if (!backendReady || inStock.length === 0) return null;
-
   const setLine = (i: number, patch: Partial<Line>) =>
     setLines((ls) => ls.map((l, j) => (j === i ? { ...l, ...patch } : l)));
   const usedSlugs = new Set(lines.map((l) => l.slug));
-  const estimate = lines.reduce(
+  const estimate = lines.reduce<{ cents: number; quoted: boolean }>(
     (acc, l) => {
       const c = priceCents(l.slug, l.quantity);
       return c == null ? { ...acc, quoted: true } : { ...acc, cents: acc.cents + c };
@@ -112,11 +123,26 @@ export function OrderForm({ initialProduct = "" }: { initialProduct?: string }) 
         },
       });
       setDone(String(result.id).slice(0, 8).toUpperCase());
+      if (cartMode) cart.clear();
     } catch (err) {
       setError(errorText(err));
     } finally {
       setBusy(false);
     }
+  }
+
+  if (cartMode && lines.length === 0 && !done) {
+    return (
+      <div className="rounded-lg border border-dashed border-border p-10 text-center">
+        <p className="font-serif text-2xl text-primary">Your order is empty.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Add products from the catalog and they'll show up here.
+        </p>
+        <a href="/catalog" className="mt-6 inline-flex rounded-md bg-primary px-6 py-3 text-sm text-primary-foreground">
+          Browse the catalog
+        </a>
+      </div>
+    );
   }
 
   if (done) {

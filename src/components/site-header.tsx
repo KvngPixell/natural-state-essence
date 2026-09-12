@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, ShoppingBag, X } from "lucide-react";
+import { useCart } from "@/components/cart-context";
 
 const navLinks = [
   { to: "/catalog", label: "Catalog" },
@@ -9,12 +10,35 @@ const navLinks = [
   { to: "/contact", label: "Contact" },
 ] as const;
 
+/** Opens the order drawer; shows how many vials are in it. */
+function CartButton({ className = "" }: { className?: string }) {
+  const { count, setOpen } = useCart();
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      aria-label={count > 0 ? `Your order — ${count} vial${count === 1 ? "" : "s"}` : "Your order — empty"}
+      className={
+        "relative shrink-0 rounded-md border border-border p-2 text-primary transition-colors hover:border-accent " +
+        className
+      }
+    >
+      <ShoppingBag className="size-5" strokeWidth={1.6} />
+      {count > 0 && (
+        <span className="absolute -top-2 -right-2 flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-[0.65rem] leading-none font-medium text-accent-foreground tabular-nums">
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/95 backdrop-blur">
-      <div className="mx-auto grid h-20 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 sm:px-8 lg:h-22">
+      <div className="mx-auto grid h-20 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 sm:gap-4 sm:px-8 lg:h-22">
         <Link to="/" className="min-w-0" aria-label="Natural State Peptides home">
           {/* Temporary text logo — swap for the final brand mark later */}
           <span className="block truncate font-serif text-xl leading-none text-primary sm:text-2xl">
@@ -42,17 +66,21 @@ export function SiteHeader() {
           >
             Ambassador Login
           </Link>
+          <CartButton />
         </nav>
 
-        <button
+        <div className="flex items-center gap-2 lg:hidden">
+          <CartButton />
+          <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
-          className="shrink-0 rounded-md border border-border p-2 text-primary lg:hidden"
+          className="shrink-0 rounded-md border border-border p-2 text-primary"
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
+          </button>
+        </div>
       </div>
 
       {open && (

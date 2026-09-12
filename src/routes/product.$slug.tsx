@@ -2,14 +2,14 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { FileText, FlaskConical } from "lucide-react";
 
-import { getProductBySlug, products, usd, MAX_PRICED_QTY, RESEARCH_DISCLAIMER, type Variant } from "@/data/products";
+import { getProductBySlug, getSku, products, usd, MAX_PRICED_QTY, RESEARCH_DISCLAIMER, type Variant } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 import { ContactCta } from "@/components/contact-cta";
 import { ProductVial } from "@/components/product-vial";
 import { StatusBadge } from "@/components/status-badge";
 import { ProductSchema } from "@/components/structured-data";
 import { AvailabilityNotify } from "@/components/availability-notify";
-import { OrderForm } from "@/components/order-form";
+import { AddToOrder } from "@/components/add-to-order";
 
 const badges = [
   { icon: FlaskConical, label: "Research Use Only" },
@@ -122,15 +122,13 @@ function ProductDetail() {
                 ))}
               </ul>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                {orderable && (
-                  <a
-                    href="#order"
-                    className="inline-flex justify-center rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
-                  >
-                    Place Order
-                  </a>
-                )}
+              {orderable && (
+                <div className="mt-8">
+                  <AddToOrder sku={getSku(variant.sku)!} />
+                </div>
+              )}
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Link
                   to="/contact"
                   search={{ product: product.slug, intent: "product" }}
@@ -173,12 +171,6 @@ function ProductDetail() {
         </div>
 
         {!orderable && <AvailabilityNotify product={product} />}
-        {orderable && (
-          <div className="mt-16">
-            {/* Keyed so switching strength above pre-selects it in the form. */}
-            <OrderForm key={variant.sku} initialProduct={variant.sku} />
-          </div>
-        )}
 
         <div className="mt-16 rounded-lg border border-border bg-secondary/50 p-7">
           <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Disclaimer</p>

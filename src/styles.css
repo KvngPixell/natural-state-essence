@@ -41,6 +41,8 @@
      back to "Cormorant Garamond". */
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Used only for the "Keep It Natural." signature. */
+  --font-script: "Parisienne", "Playfair Display", cursive;
   --shadow-soft: 0 1px 2px oklch(0.22 0.05 155 / 0.04), 0 12px 32px -18px oklch(0.22 0.05 155 / 0.28);
   --shadow-lift: 0 2px 4px oklch(0.22 0.05 155 / 0.06), 0 24px 48px -24px oklch(0.22 0.05 155 / 0.35);
 }
@@ -114,6 +116,28 @@
   font-weight: 500;
 }
 
+@utility script {
+  font-family: var(--font-script);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+
+/* Reveal-on-scroll: elements start slightly low and fade in when observed.
+   Without JS (or with reduced motion) they simply render in place. */
+@utility reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@utility reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
 @utility rule-gold {
   height: 1px;
   width: 3rem;
@@ -133,5 +157,56 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@layer components {
+  /* Earnings slider on the forest background. Native range inputs need their
+     track and thumb styled per engine, so this stays plain CSS. */
+  .range-gold {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--ivory) 28%, transparent);
+    outline: none;
+  }
+  .range-gold::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 9999px;
+    background: var(--gold);
+    border: 3px solid var(--forest);
+    box-shadow: 0 4px 14px oklch(0 0 0 / 0.35);
+    cursor: pointer;
+  }
+  .range-gold::-moz-range-thumb {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 9999px;
+    background: var(--gold);
+    border: 3px solid var(--forest);
+    box-shadow: 0 4px 14px oklch(0 0 0 / 0.35);
+    cursor: pointer;
+  }
+  .range-gold:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--gold) 45%, transparent);
+  }
+  .range-gold:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--gold) 45%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

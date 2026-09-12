@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
 import { PortalProvider } from "@/components/portal-context";
+import { CartProvider } from "@/components/cart-context";
+import { CartDrawer } from "@/components/cart-drawer";
 import { SiteFooter } from "@/components/site-footer";
 import { ResearchBanner } from "@/components/research-banner";
 import { OrganizationSchema } from "@/components/structured-data";
@@ -102,7 +104,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=Parisienne&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -132,7 +134,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PortalProvider><div className="flex min-h-screen flex-col">
+      <PortalProvider><CartProvider><div className="flex min-h-screen flex-col">
         <OrganizationSchema />
         <ResearchBanner />
         <SiteHeader />
@@ -141,7 +143,8 @@ function RootComponent() {
           <Outlet />
         </main>
         <SiteFooter />
-      </div></PortalProvider>
+        <CartDrawer />
+      </div></CartProvider></PortalProvider>
     </QueryClientProvider>
   );
 }

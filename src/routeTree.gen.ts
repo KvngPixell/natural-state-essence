@@ -15,6 +15,7 @@ import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as QualityRouteImport } from './routes/quality'
+import { Route as OrderRouteImport } from './routes/order'
 import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -57,6 +58,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const QualityRoute = QualityRouteImport.update({
   id: '/quality',
   path: '/quality',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrderRoute = OrderRouteImport.update({
+  id: '/order',
+  path: '/order',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerRoute = OwnerRouteImport.update({
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
+  '/order': typeof OrderRoute
   '/owner': typeof OwnerRoute
   '/r/$code': typeof RCodeRoute
   '/terms': typeof TermsRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
+  '/order': typeof OrderRoute
   '/owner': typeof OwnerRoute
   '/r/$code': typeof RCodeRoute
   '/terms': typeof TermsRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/quality': typeof QualityRoute
+  '/order': typeof OrderRoute
   '/owner': typeof OwnerRoute
   '/r/$code': typeof RCodeRoute
   '/terms': typeof TermsRoute
@@ -215,6 +224,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/quality'
+    | '/order'
     | '/owner'
     | '/r/$code'
     | '/terms'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/quality'
+    | '/order'
     | '/owner'
     | '/r/$code'
     | '/terms'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/quality'
+    | '/order'
     | '/owner'
     | '/r/$code'
     | '/terms'
@@ -278,6 +290,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
   QualityRoute: typeof QualityRoute
+  OrderRoute: typeof OrderRoute
   OwnerRoute: typeof OwnerRoute
   RCodeRoute: typeof RCodeRoute
   TermsRoute: typeof TermsRoute
@@ -331,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/quality'
       fullPath: '/quality'
       preLoaderRoute: typeof QualityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/order': {
+      id: '/order'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof OrderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner': {
@@ -434,6 +454,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
   QualityRoute: QualityRoute,
+  OrderRoute: OrderRoute,
   OwnerRoute: OwnerRoute,
   RCodeRoute: RCodeRoute,
   TermsRoute: TermsRoute,
