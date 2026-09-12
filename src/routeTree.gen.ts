@@ -13,22 +13,22 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AmbassadorRouteImport } from './routes/ambassador'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as QualityRouteImport } from './routes/quality'
 import { Route as OrderRouteImport } from './routes/order'
 import { Route as OwnerRouteImport } from './routes/owner'
-import { Route as RCodeRouteImport } from './routes/r.$code'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as QualityRouteImport } from './routes/quality'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminAmbassadorsRouteImport } from './routes/admin.ambassadors'
 import { Route as AdminPartnersRouteImport } from './routes/admin.partners'
+import { Route as AmbassadorIndexRouteImport } from './routes/ambassador.index'
+import { Route as AmbassadorDashboardRouteImport } from './routes/ambassador.dashboard'
+import { Route as AmbassadorLoginRouteImport } from './routes/ambassador.login'
+import { Route as AmbassadorResetRouteImport } from './routes/ambassador.reset'
 import { Route as PartnerDashboardRouteImport } from './routes/partner.dashboard'
 import { Route as PartnerLoginRouteImport } from './routes/partner.login'
 import { Route as PartnerResetRouteImport } from './routes/partner.reset'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
-import { Route as AmbassadorDashboardRouteImport } from './routes/ambassador.dashboard'
-import { Route as AmbassadorLoginRouteImport } from './routes/ambassador.login'
-import { Route as AmbassadorResetRouteImport } from './routes/ambassador.reset'
-import { Route as AmbassadorIndexRouteImport } from './routes/ambassador.index'
+import { Route as RCodeRouteImport } from './routes/r.$code'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -50,16 +50,6 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QualityRoute = QualityRouteImport.update({
-  id: '/quality',
-  path: '/quality',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const OrderRoute = OrderRouteImport.update({
   id: '/order',
   path: '/order',
@@ -70,9 +60,14 @@ const OwnerRoute = OwnerRouteImport.update({
   path: '/owner',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RCodeRoute = RCodeRouteImport.update({
-  id: '/r/$code',
-  path: '/r/$code',
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QualityRoute = QualityRouteImport.update({
+  id: '/quality',
+  path: '/quality',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -89,6 +84,26 @@ const AdminPartnersRoute = AdminPartnersRouteImport.update({
   id: '/admin/partners',
   path: '/admin/partners',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AmbassadorIndexRoute = AmbassadorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AmbassadorRoute,
+} as any)
+const AmbassadorDashboardRoute = AmbassadorDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AmbassadorRoute,
+} as any)
+const AmbassadorLoginRoute = AmbassadorLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AmbassadorRoute,
+} as any)
+const AmbassadorResetRoute = AmbassadorResetRouteImport.update({
+  id: '/reset',
+  path: '/reset',
+  getParentRoute: () => AmbassadorRoute,
 } as any)
 const PartnerDashboardRoute = PartnerDashboardRouteImport.update({
   id: '/partner/dashboard',
@@ -110,86 +125,53 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AmbassadorDashboardRoute = AmbassadorDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AmbassadorRoute,
+const RCodeRoute = RCodeRouteImport.update({
+  id: '/r/$code',
+  path: '/r/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AmbassadorLoginRoute = AmbassadorLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AmbassadorRoute,
-} as any)
-const AmbassadorResetRoute = AmbassadorResetRouteImport.update({
-  id: '/reset',
-  path: '/reset',
-  getParentRoute: () => AmbassadorRoute,
-} as any)
-const AmbassadorIndexRoute = AmbassadorIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AmbassadorRoute,
-} as any)
-
-interface AmbassadorRouteChildren {
-  AmbassadorDashboardRoute: typeof AmbassadorDashboardRoute
-  AmbassadorLoginRoute: typeof AmbassadorLoginRoute
-  AmbassadorResetRoute: typeof AmbassadorResetRoute
-  AmbassadorIndexRoute: typeof AmbassadorIndexRoute
-}
-
-const AmbassadorRouteChildren: AmbassadorRouteChildren = {
-  AmbassadorDashboardRoute: AmbassadorDashboardRoute,
-  AmbassadorLoginRoute: AmbassadorLoginRoute,
-  AmbassadorResetRoute: AmbassadorResetRoute,
-  AmbassadorIndexRoute: AmbassadorIndexRoute,
-}
-
-const AmbassadorRouteWithChildren = AmbassadorRoute._addFileChildren(
-  AmbassadorRouteChildren,
-)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ambassador': typeof AmbassadorRouteWithChildren
   '/catalog': typeof CatalogRoute
   '/contact': typeof ContactRoute
-  '/privacy': typeof PrivacyRoute
-  '/quality': typeof QualityRoute
   '/order': typeof OrderRoute
   '/owner': typeof OwnerRoute
-  '/r/$code': typeof RCodeRoute
+  '/privacy': typeof PrivacyRoute
+  '/quality': typeof QualityRoute
   '/terms': typeof TermsRoute
   '/admin/ambassadors': typeof AdminAmbassadorsRoute
   '/admin/partners': typeof AdminPartnersRoute
+  '/ambassador/dashboard': typeof AmbassadorDashboardRoute
+  '/ambassador/login': typeof AmbassadorLoginRoute
+  '/ambassador/reset': typeof AmbassadorResetRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/login': typeof PartnerLoginRoute
   '/partner/reset': typeof PartnerResetRoute
   '/product/$slug': typeof ProductSlugRoute
-  '/ambassador/dashboard': typeof AmbassadorDashboardRoute
-  '/ambassador/login': typeof AmbassadorLoginRoute
-  '/ambassador/reset': typeof AmbassadorResetRoute
+  '/r/$code': typeof RCodeRoute
   '/ambassador/': typeof AmbassadorIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/catalog': typeof CatalogRoute
   '/contact': typeof ContactRoute
-  '/privacy': typeof PrivacyRoute
-  '/quality': typeof QualityRoute
   '/order': typeof OrderRoute
   '/owner': typeof OwnerRoute
-  '/r/$code': typeof RCodeRoute
+  '/privacy': typeof PrivacyRoute
+  '/quality': typeof QualityRoute
   '/terms': typeof TermsRoute
   '/admin/ambassadors': typeof AdminAmbassadorsRoute
   '/admin/partners': typeof AdminPartnersRoute
+  '/ambassador/dashboard': typeof AmbassadorDashboardRoute
+  '/ambassador/login': typeof AmbassadorLoginRoute
+  '/ambassador/reset': typeof AmbassadorResetRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/login': typeof PartnerLoginRoute
   '/partner/reset': typeof PartnerResetRoute
   '/product/$slug': typeof ProductSlugRoute
-  '/ambassador/dashboard': typeof AmbassadorDashboardRoute
-  '/ambassador/login': typeof AmbassadorLoginRoute
-  '/ambassador/reset': typeof AmbassadorResetRoute
+  '/r/$code': typeof RCodeRoute
   '/ambassador': typeof AmbassadorIndexRoute
 }
 export interface FileRoutesById {
@@ -198,21 +180,21 @@ export interface FileRoutesById {
   '/ambassador': typeof AmbassadorRouteWithChildren
   '/catalog': typeof CatalogRoute
   '/contact': typeof ContactRoute
-  '/privacy': typeof PrivacyRoute
-  '/quality': typeof QualityRoute
   '/order': typeof OrderRoute
   '/owner': typeof OwnerRoute
-  '/r/$code': typeof RCodeRoute
+  '/privacy': typeof PrivacyRoute
+  '/quality': typeof QualityRoute
   '/terms': typeof TermsRoute
   '/admin/ambassadors': typeof AdminAmbassadorsRoute
   '/admin/partners': typeof AdminPartnersRoute
+  '/ambassador/dashboard': typeof AmbassadorDashboardRoute
+  '/ambassador/login': typeof AmbassadorLoginRoute
+  '/ambassador/reset': typeof AmbassadorResetRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/login': typeof PartnerLoginRoute
   '/partner/reset': typeof PartnerResetRoute
   '/product/$slug': typeof ProductSlugRoute
-  '/ambassador/dashboard': typeof AmbassadorDashboardRoute
-  '/ambassador/login': typeof AmbassadorLoginRoute
-  '/ambassador/reset': typeof AmbassadorResetRoute
+  '/r/$code': typeof RCodeRoute
   '/ambassador/': typeof AmbassadorIndexRoute
 }
 export interface FileRouteTypes {
@@ -222,42 +204,42 @@ export interface FileRouteTypes {
     | '/ambassador'
     | '/catalog'
     | '/contact'
-    | '/privacy'
-    | '/quality'
     | '/order'
     | '/owner'
-    | '/r/$code'
+    | '/privacy'
+    | '/quality'
     | '/terms'
     | '/admin/ambassadors'
     | '/admin/partners'
+    | '/ambassador/dashboard'
+    | '/ambassador/login'
+    | '/ambassador/reset'
     | '/partner/dashboard'
     | '/partner/login'
     | '/partner/reset'
     | '/product/$slug'
-    | '/ambassador/dashboard'
-    | '/ambassador/login'
-    | '/ambassador/reset'
+    | '/r/$code'
     | '/ambassador/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/catalog'
     | '/contact'
-    | '/privacy'
-    | '/quality'
     | '/order'
     | '/owner'
-    | '/r/$code'
+    | '/privacy'
+    | '/quality'
     | '/terms'
     | '/admin/ambassadors'
     | '/admin/partners'
+    | '/ambassador/dashboard'
+    | '/ambassador/login'
+    | '/ambassador/reset'
     | '/partner/dashboard'
     | '/partner/login'
     | '/partner/reset'
     | '/product/$slug'
-    | '/ambassador/dashboard'
-    | '/ambassador/login'
-    | '/ambassador/reset'
+    | '/r/$code'
     | '/ambassador'
   id:
     | '__root__'
@@ -265,21 +247,21 @@ export interface FileRouteTypes {
     | '/ambassador'
     | '/catalog'
     | '/contact'
-    | '/privacy'
-    | '/quality'
     | '/order'
     | '/owner'
-    | '/r/$code'
+    | '/privacy'
+    | '/quality'
     | '/terms'
     | '/admin/ambassadors'
     | '/admin/partners'
+    | '/ambassador/dashboard'
+    | '/ambassador/login'
+    | '/ambassador/reset'
     | '/partner/dashboard'
     | '/partner/login'
     | '/partner/reset'
     | '/product/$slug'
-    | '/ambassador/dashboard'
-    | '/ambassador/login'
-    | '/ambassador/reset'
+    | '/r/$code'
     | '/ambassador/'
   fileRoutesById: FileRoutesById
 }
@@ -288,11 +270,10 @@ export interface RootRouteChildren {
   AmbassadorRoute: typeof AmbassadorRouteWithChildren
   CatalogRoute: typeof CatalogRoute
   ContactRoute: typeof ContactRoute
-  PrivacyRoute: typeof PrivacyRoute
-  QualityRoute: typeof QualityRoute
   OrderRoute: typeof OrderRoute
   OwnerRoute: typeof OwnerRoute
-  RCodeRoute: typeof RCodeRoute
+  PrivacyRoute: typeof PrivacyRoute
+  QualityRoute: typeof QualityRoute
   TermsRoute: typeof TermsRoute
   AdminAmbassadorsRoute: typeof AdminAmbassadorsRoute
   AdminPartnersRoute: typeof AdminPartnersRoute
@@ -300,6 +281,7 @@ export interface RootRouteChildren {
   PartnerLoginRoute: typeof PartnerLoginRoute
   PartnerResetRoute: typeof PartnerResetRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  RCodeRoute: typeof RCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -332,20 +314,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quality': {
-      id: '/quality'
-      path: '/quality'
-      fullPath: '/quality'
-      preLoaderRoute: typeof QualityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/order': {
       id: '/order'
       path: '/order'
@@ -360,11 +328,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/r/$code': {
-      id: '/r/$code'
-      path: '/r/$code'
-      fullPath: '/r/$code'
-      preLoaderRoute: typeof RCodeRouteImport
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quality': {
+      id: '/quality'
+      path: '/quality'
+      fullPath: '/quality'
+      preLoaderRoute: typeof QualityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -387,6 +362,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/partners'
       preLoaderRoute: typeof AdminPartnersRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/ambassador/': {
+      id: '/ambassador/'
+      path: '/'
+      fullPath: '/ambassador/'
+      preLoaderRoute: typeof AmbassadorIndexRouteImport
+      parentRoute: typeof AmbassadorRoute
+    }
+    '/ambassador/dashboard': {
+      id: '/ambassador/dashboard'
+      path: '/dashboard'
+      fullPath: '/ambassador/dashboard'
+      preLoaderRoute: typeof AmbassadorDashboardRouteImport
+      parentRoute: typeof AmbassadorRoute
+    }
+    '/ambassador/login': {
+      id: '/ambassador/login'
+      path: '/login'
+      fullPath: '/ambassador/login'
+      preLoaderRoute: typeof AmbassadorLoginRouteImport
+      parentRoute: typeof AmbassadorRoute
+    }
+    '/ambassador/reset': {
+      id: '/ambassador/reset'
+      path: '/reset'
+      fullPath: '/ambassador/reset'
+      preLoaderRoute: typeof AmbassadorResetRouteImport
+      parentRoute: typeof AmbassadorRoute
     }
     '/partner/dashboard': {
       id: '/partner/dashboard'
@@ -416,47 +419,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ambassador/dashboard': {
-      id: '/ambassador/dashboard'
-      path: '/dashboard'
-      fullPath: '/ambassador/dashboard'
-      preLoaderRoute: typeof AmbassadorDashboardRouteImport
-      parentRoute: typeof AmbassadorRoute
-    }
-    '/ambassador/login': {
-      id: '/ambassador/login'
-      path: '/login'
-      fullPath: '/ambassador/login'
-      preLoaderRoute: typeof AmbassadorLoginRouteImport
-      parentRoute: typeof AmbassadorRoute
-    }
-    '/ambassador/reset': {
-      id: '/ambassador/reset'
-      path: '/reset'
-      fullPath: '/ambassador/reset'
-      preLoaderRoute: typeof AmbassadorResetRouteImport
-      parentRoute: typeof AmbassadorRoute
-    }
-    '/ambassador/': {
-      id: '/ambassador/'
-      path: '/'
-      fullPath: '/ambassador/'
-      preLoaderRoute: typeof AmbassadorIndexRouteImport
-      parentRoute: typeof AmbassadorRoute
+    '/r/$code': {
+      id: '/r/$code'
+      path: '/r/$code'
+      fullPath: '/r/$code'
+      preLoaderRoute: typeof RCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
+
+interface AmbassadorRouteChildren {
+  AmbassadorDashboardRoute: typeof AmbassadorDashboardRoute
+  AmbassadorLoginRoute: typeof AmbassadorLoginRoute
+  AmbassadorResetRoute: typeof AmbassadorResetRoute
+  AmbassadorIndexRoute: typeof AmbassadorIndexRoute
+}
+
+const AmbassadorRouteChildren: AmbassadorRouteChildren = {
+  AmbassadorDashboardRoute: AmbassadorDashboardRoute,
+  AmbassadorLoginRoute: AmbassadorLoginRoute,
+  AmbassadorResetRoute: AmbassadorResetRoute,
+  AmbassadorIndexRoute: AmbassadorIndexRoute,
+}
+
+const AmbassadorRouteWithChildren = AmbassadorRoute._addFileChildren(
+  AmbassadorRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AmbassadorRoute: AmbassadorRouteWithChildren,
   CatalogRoute: CatalogRoute,
   ContactRoute: ContactRoute,
-  PrivacyRoute: PrivacyRoute,
-  QualityRoute: QualityRoute,
   OrderRoute: OrderRoute,
   OwnerRoute: OwnerRoute,
-  RCodeRoute: RCodeRoute,
+  PrivacyRoute: PrivacyRoute,
+  QualityRoute: QualityRoute,
   TermsRoute: TermsRoute,
   AdminAmbassadorsRoute: AdminAmbassadorsRoute,
   AdminPartnersRoute: AdminPartnersRoute,
@@ -464,6 +463,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerLoginRoute: PartnerLoginRoute,
   PartnerResetRoute: PartnerResetRoute,
   ProductSlugRoute: ProductSlugRoute,
+  RCodeRoute: RCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
