@@ -96,7 +96,7 @@ export function AmbassadorApplication() {
         <p className="mt-4 leading-relaxed text-muted-foreground">
           If there's a fit, we'll reach out with the next step and the applicable Ambassador Program terms.
         </p>
-        <p className="script mt-8 text-3xl text-accent">Keep It Natural.</p>
+        <p className="script mt-8 text-4xl text-accent">Keep It Natural.</p>
       </div>
     );
   }

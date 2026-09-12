@@ -124,7 +124,7 @@ function AmbassadorLanding() {
                   Already approved? Ambassador Login
                 </Link>
               </div>
-              <p className="script mt-9 text-[2.1rem] text-gold sm:mt-12 sm:text-5xl">Keep It Natural.</p>
+              <p className="script mt-9 text-[2.4rem] text-gold sm:mt-12 sm:text-6xl">Keep It Natural.</p>
             </Reveal>
 
             {/* Opportunity panel — a column of the composition, not a card. */}
@@ -421,7 +421,7 @@ function AmbassadorLanding() {
                   </Reveal>
                 ))}
               </dl>
-              <p className="script mt-14 text-4xl text-gold sm:text-5xl">Keep It Natural.</p>
+              <p className="script mt-14 text-5xl text-gold sm:text-6xl">Keep It Natural.</p>
             </Reveal>
             <Reveal delay={140} className="justify-self-center">
               <img
@@ -488,7 +488,7 @@ function AmbassadorLanding() {
               style={{ background: "linear-gradient(180deg, oklch(0.244 0.045 160 / 0.55) 0%, oklch(0.244 0.045 160 / 0.8) 100%)" }}
             />
             <div className="relative flex h-full flex-col justify-end p-8 sm:p-12 lg:p-16">
-              <p className="script text-4xl text-gold sm:text-5xl">Keep It Natural.</p>
+              <p className="script text-5xl text-gold sm:text-6xl">Keep It Natural.</p>
               <p className="mt-5 max-w-sm leading-relaxed text-ivory/80">
                 Applications are reviewed individually. We'll be in touch if there's a fit.
               </p>
@@ -527,7 +527,7 @@ function AmbassadorLanding() {
         />
         <div className={SHELL + " relative flex flex-col items-center py-24 text-center sm:py-32"}>
           <Reveal>
-            <p className="script text-5xl text-gold sm:text-7xl">Keep It Natural.</p>
+            <p className="script text-6xl text-gold sm:text-8xl">Keep It Natural.</p>
             <p className="mt-8 font-serif text-3xl leading-tight text-ivory sm:text-4xl">
               Build something you're proud to represent.
             </p>
