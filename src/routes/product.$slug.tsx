@@ -2,7 +2,15 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { FileText, FlaskConical } from "lucide-react";
 
-import { getProductBySlug, getSku, products, usd, MAX_PRICED_QTY, RESEARCH_DISCLAIMER, type Variant } from "@/data/products";
+import {
+  getProductBySlug,
+  getSku,
+  products,
+  priceCents,
+  usd,
+  RESEARCH_DISCLAIMER,
+  type Variant,
+} from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 import { ContactCta } from "@/components/contact-cta";
 import { ProductVial } from "@/components/product-vial";
@@ -196,6 +204,8 @@ function ProductDetail() {
 
 function PricePanel({ variant }: { variant: Variant }) {
   const p = variant.prices;
+  const at4 = p ? priceCents(variant.sku, 4) : null;
+  const at5 = p ? priceCents(variant.sku, 5) : null;
   return (
     <div className="mt-6 max-w-lg rounded-lg border border-border bg-card p-5 shadow-soft">
       <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Price · {variant.strength}</p>
@@ -215,9 +225,32 @@ function PricePanel({ variant }: { variant: Variant }) {
               );
             })}
           </dl>
+          {(at4 != null || at5 != null) && (
+            <dl className="mt-3 grid grid-cols-2 divide-x divide-border border-t border-border pt-3 text-center">
+              {at4 != null && (
+                <div className="px-2">
+                  <dt className="text-xs text-muted-foreground">4 vials</dt>
+                  <dd className="mt-1 font-serif text-2xl text-primary tabular-nums sm:text-3xl">
+                    {usd(at4 / 100)}
+                  </dd>
+                  <dd className="mt-0.5 text-[0.7rem] text-accent">same per vial as 3</dd>
+                </div>
+              )}
+              {at5 != null && (
+                <div className="px-2">
+                  <dt className="text-xs text-muted-foreground">5 vials</dt>
+                  <dd className="mt-1 font-serif text-2xl text-primary tabular-nums sm:text-3xl">
+                    {usd(at5 / 100)}
+                  </dd>
+                  <dd className="mt-0.5 text-[0.7rem] text-accent">save {usd(p[0] * 5 - at5 / 100)}</dd>
+                </div>
+              )}
+            </dl>
+          )}
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-            More than {MAX_PRICED_QTY} vials? We'll quote you. Payment is arranged directly — cash, Cash App,
-            Venmo or crypto. Local pickup or delivery in the Hot Springs, Arkansas area.
+            4 vials: same per-vial price as 3. 5–9 vials: 5% off the 3-vial price. 10+: we'll quote you.
+            Payment is arranged directly — cash, Cash App, Venmo or crypto. Local pickup or delivery in the
+            Hot Springs, Arkansas area.
           </p>
         </>
       ) : (

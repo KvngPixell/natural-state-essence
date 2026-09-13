@@ -44,7 +44,7 @@ const sections: [string, string[]][] = [
     "4. Pickup and local delivery",
     [
       "We currently offer local pickup and local delivery in the Hot Springs, Arkansas area only. We are not shipping orders at this time. When you place an order request, we will confirm your total and arrange a pickup time or delivery details with you directly.",
-      "Prices shown on this site are for 1, 2 or 3 vials of a product and strength. Larger quantities are quoted individually. Prices and availability may change, and your total is only final once we confirm it with you. Any delivery fee will be confirmed before you pay.",
+      "Prices shown on this site are for 1 through 9 vials of a product and strength. Quantities of 10 or more are quoted individually. Prices and availability may change, and your total is only final once we confirm it with you. Any delivery fee will be confirmed before you pay.",
       "Material is packed appropriate to the product, including temperature-protective packaging where the product requires it.",
     ],
   ],

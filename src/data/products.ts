@@ -88,7 +88,7 @@ const seeds: Seed[] = [
     researchNotes:
       "Epitalon, also written Epithalon, is a synthetic tetrapeptide with the sequence Ala-Glu-Asp-Gly. It was developed as a synthetic counterpart to epithalamin, a pineal gland extract, in Russian gerontology research. Published literature concerns telomerase activity, pineal and circadian regulation, and markers associated with cellular senescence. Much of the primary research originates from a small number of research groups, which is worth weighing when reading the available evidence.",
     featured: true,
-    prices: [40, 75, 90],
+    prices: [40, 75, 110],
   },
   {
     name: "CJC-1295 (No DAC) + Ipamorelin",
@@ -114,7 +114,7 @@ const seeds: Seed[] = [
     researchNotes:
       "Pinealon is a tripeptide with the sequence Glu-Asp-Arg, one of a family of short peptides described in Russian research literature as peptide bioregulators. Published work concerns neuronal cell function, responses to oxidative stress, and cognition-related measures in animal models. As with other compounds in that family, the body of primary research is concentrated among a small number of groups.",
     featured: true,
-    prices: [45, 80, 95],
+    prices: [45, 80, 115],
   },
   {
     name: "MOTS-C",
@@ -349,13 +349,30 @@ export function getSku(sku: string | null | undefined) {
 }
 
 /** Published prices cover up to this many vials of one strength; larger quantities are quoted. */
-export const MAX_PRICED_QTY = 3;
+export const MAX_PRICED_QTY = 9;
 
-/** Estimated price in cents for `qty` vials, or null when unpriced or above the published quantities. */
+/** Round to the nearest $5 — the increment every published multi-vial ticket lands on. */
+function roundTo5(dollars: number): number {
+  return Math.round(dollars / 5) * 5;
+}
+
+/**
+ * Estimated price in cents for `qty` vials, or null when unpriced or above the published quantities.
+ *
+ * 1–3 vials use the locked per-strength prices as-is. 4 vials carries the same per-vial rate as 3
+ * (no added discount). 5 vials takes 5% off the 3-vial per-vial rate; 6–9 vials carry that same
+ * 5-vial per-vial rate forward. Every multi-vial ticket is rounded to the nearest $5.
+ */
 export function priceCents(sku: string | null | undefined, qty: number): number | null {
   const s = getSku(sku);
   if (!s?.prices || !Number.isInteger(qty) || qty < 1 || qty > MAX_PRICED_QTY) return null;
-  return s.prices[qty - 1] * 100;
+  if (qty <= 3) return s.prices[qty - 1] * 100;
+  const unit3 = s.prices[2] / 3;
+  if (qty === 4) return roundTo5(unit3 * 4) * 100;
+  const ticket5 = roundTo5(unit3 * 0.95 * 5);
+  if (qty === 5) return ticket5 * 100;
+  const unit5 = ticket5 / 5;
+  return roundTo5(unit5 * qty) * 100;
 }
 
 export const usd = (dollars: number) => "$" + dollars.toLocaleString("en-US");
