@@ -151,8 +151,8 @@ export function OrderForm({
         <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Order request received</p>
         <h2 className="mt-2 font-serif text-3xl text-primary">Thank you, {first.trim()}.</h2>
         <p className="mt-4 text-sm leading-relaxed text-foreground/75">
-          Your request <strong>#{done}</strong> is with our team. We'll confirm availability and your
-          total, then contact you by phone or email to arrange {PAYMENT_METHODS.find((m) => m.value === payment)?.label}
+          Your request <strong>#{done}</strong> is with our team. We'll reach out within 24 hours by phone or
+          email to confirm availability and your total, and arrange {PAYMENT_METHODS.find((m) => m.value === payment)?.label}
           {fulfil === "pickup" ? " and a pickup time" : " and local delivery"}. Nothing has been charged, and
           nothing is final until we confirm it with you.
         </p>
@@ -165,8 +165,8 @@ export function OrderForm({
       <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Place an order</p>
       <h2 className="mt-2 font-serif text-3xl text-primary">Request an order</h2>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-        Tell us what you need. We confirm availability and your total, then arrange payment with you
-        directly. No payment is taken on this site.
+        Tell us what you need. We'll reach out within 24 hours to confirm availability, your total, and a
+        pickup time, and arrange payment with you directly. No payment is taken on this site.
       </p>
       <form onSubmit={submit} className="mt-6 grid gap-6">
         <fieldset className="grid gap-3">
