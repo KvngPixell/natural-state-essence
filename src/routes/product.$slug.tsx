@@ -146,9 +146,11 @@ function ProductDetail() {
                       : "inline-flex justify-center rounded-md bg-primary px-7 py-3.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
                   }
                 >
-                  {!orderable
-                    ? "Ask About Availability"
-                    : "Inquire About This Product"}
+                  {orderable
+                    ? "Inquire About This Product"
+                    : variant.status === "Sold Out"
+                      ? "Tell Me When It's Back"
+                      : "Ask About Availability"}
                 </Link>
                 <Link
                   to="/contact"
@@ -209,6 +211,11 @@ function PricePanel({ variant }: { variant: Variant }) {
   return (
     <div className="mt-6 max-w-lg rounded-lg border border-border bg-card p-5 shadow-soft">
       <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Price · {variant.strength}</p>
+      {variant.status === "Sold Out" && (
+        <p className="mt-3 text-sm text-primary">
+          Currently sold out — back in stock soon. Prices below are what it returns at.
+        </p>
+      )}
       {p ? (
         <>
           <dl className="mt-4 grid grid-cols-3 divide-x divide-border text-center">

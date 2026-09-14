@@ -1,7 +1,13 @@
 import vialImage from "@/assets/vial-nsp.jpg";
 
 export type ProductCategory = "Peptides" | "Blends" | "Research Compounds";
-export type ProductStatus = "In Stock" | "Coming Soon";
+/**
+ * "Sold Out" means a product we normally carry that is temporarily out and on
+ * its way back — distinct from "Coming Soon", which is something we have never
+ * stocked. The wording matters: customers should read a gap as a restock, not
+ * as a product we don't really sell.
+ */
+export type ProductStatus = "In Stock" | "Sold Out" | "Coming Soon";
 
 /** Whole-dollar prices for 1, 2 and 3 vials of one strength. */
 export type VialPrices = readonly [number, number, number];
@@ -134,7 +140,7 @@ const seeds: Seed[] = [
     slug: "oxytocin",
     strength: "5 mg",
     category: "Peptides",
-    status: "In Stock",
+    status: "Sold Out",
     shortDescription:
       "Naturally occurring peptide hormone researched for social-bonding pathways, stress response, mood-related signaling, and reproductive physiology.",
     researchNotes:
@@ -146,7 +152,7 @@ const seeds: Seed[] = [
     slug: "semax",
     strength: "10 mg",
     category: "Peptides",
-    status: "In Stock",
+    status: "Sold Out",
     shortDescription:
       "Synthetic peptide researched for neurological signaling, cognition, stress response, and neuroprotective pathways.",
     researchNotes:
@@ -158,7 +164,7 @@ const seeds: Seed[] = [
     slug: "pt-141",
     strength: "10 mg",
     category: "Peptides",
-    status: "In Stock",
+    status: "Sold Out",
     shortDescription:
       "Melanocortin-receptor peptide studied for sexual-arousal pathways and central nervous system signaling.",
     researchNotes:
@@ -170,7 +176,7 @@ const seeds: Seed[] = [
     slug: "klow",
     strength: "80 mg",
     category: "Blends",
-    status: "Coming Soon",
+    status: "Sold Out",
     shortDescription:
       "Four-peptide research blend containing GHK-Cu, BPC-157, TB-500, and KPV, studied across tissue-repair, matrix-remodeling, inflammatory-signaling, and recovery-related pathways.",
     researchNotes:
@@ -181,7 +187,7 @@ const seeds: Seed[] = [
     slug: "glow",
     strength: "70 mg",
     category: "Blends",
-    status: "In Stock",
+    status: "Sold Out",
     shortDescription:
       "Research blend containing GHK-Cu, BPC-157, and TB-500, studied across tissue-repair, collagen-related, cellular-migration, and recovery pathways.",
     researchNotes:
@@ -218,7 +224,7 @@ const seeds: Seed[] = [
     slug: "bpc-157-tb-500",
     strength: "10 mg",
     category: "Blends",
-    status: "In Stock",
+    status: "Sold Out",
     shortDescription:
       "Research blend investigated for tissue-repair pathways, inflammation signaling, vascular responses, and recovery mechanisms.",
     researchNotes:
@@ -247,14 +253,14 @@ const seeds: Seed[] = [
       "Growth-hormone-releasing hormone analogue studied for growth-hormone signaling, metabolism, and body-composition pathways.",
     researchNotes:
       "Tesamorelin is a stabilised analogue of human growth hormone releasing hormone, GHRH(1-44), modified to resist enzymatic degradation. Published research concerns the GH/IGF-1 axis, lipid metabolism, and visceral adipose tissue measures. Among the GHRH-related compounds in this catalog it has the most substantial clinical research record, which makes it a common comparison point in the literature for the shorter fragments.",
-    prices: [110, 190, 265],
+    prices: [90, 165, 230],
   },
   {
     name: "Kisspeptin-10",
     slug: "kisspeptin-10",
     strength: "5 mg",
     category: "Peptides",
-    status: "In Stock",
+    status: "Sold Out",
     shortDescription:
       "Signalling peptide studied in reproductive endocrinology research, including gonadotropin-releasing pathways and hormonal regulation mechanisms.",
     researchNotes:
@@ -266,7 +272,7 @@ const seeds: Seed[] = [
     slug: "kpv",
     strength: "10 mg",
     category: "Peptides",
-    status: "In Stock",
+    status: "Sold Out",
     shortDescription:
       "Tripeptide fragment studied for inflammatory-signalling pathways, cellular response mechanisms, and tissue-related research.",
     researchNotes:
@@ -308,7 +314,14 @@ export const products: Product[] = seeds.map((s, i) => {
   variants,
   fromPrice: priced.length ? Math.min(...priced) : null,
   category: s.category,
-  status: (variants.some((v) => v.status === "In Stock") ? "In Stock" : "Coming Soon") as ProductStatus,
+  // A product is in stock if any single strength is. Otherwise it reports the
+  // more optimistic of the remaining states, so a product with one sold-out
+  // strength and one never-stocked strength still reads as "Sold Out".
+  status: (variants.some((v) => v.status === "In Stock")
+    ? "In Stock"
+    : variants.some((v) => v.status === "Sold Out")
+      ? "Sold Out"
+      : "Coming Soon") as ProductStatus,
   shortDescription: s.shortDescription,
   longDescription: `${s.name} is supplied as a lyophilised research material for laboratory research use only. ${s.shortDescription} It is not supplied for human or animal use, and no dosing or handling guidance beyond standard laboratory practice is provided.`,
   researchNotes: s.researchNotes,
@@ -328,7 +341,16 @@ export const categoryFilters = [
   "Research Compounds",
 ] as const;
 
-export const availabilityFilters = ["All", "In Stock", "Coming Soon"] as const;
+/**
+ * Derived from what is actually in the catalog, so the dropdown never offers a
+ * filter that would return nothing.
+ */
+export const availabilityFilters: string[] = [
+  "All",
+  ...(["In Stock", "Sold Out", "Coming Soon"] as ProductStatus[]).filter((s) =>
+    products.some((p) => p.status === s),
+  ),
+];
 
 export function getProductBySlug(slug: string) {
   return products.find((p) => p.slug === slug);

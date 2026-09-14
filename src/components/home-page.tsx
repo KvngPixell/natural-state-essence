@@ -16,11 +16,11 @@ const faq = [
   ],
   [
     "Which products are available?",
-    "The current collection below shows products marked In Stock. The full catalog also includes Coming Soon products, which are listed so you can ask to be told when they arrive.",
+    "The collection below shows products marked In Stock. Anything marked Sold Out is part of our regular catalog and is on its way back — it stays listed so you can ask to be told the moment it lands.",
   ],
   [
-    "What does Coming Soon mean?",
-    "The product is part of our catalog but is not currently available to supply. Send an availability inquiry and we will tell you what we know about timing.",
+    "What does Sold Out mean?",
+    "It means we normally carry that product and are between shipments, not that we have stopped supplying it. Send an availability inquiry and we will tell you what we know about timing and let you know when it is back.",
   ],
   [
     "Can these products be used by people or animals?",

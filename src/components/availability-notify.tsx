@@ -5,8 +5,9 @@ import { backendReady, edge, field, button } from "@/lib/backend";
 import { visitorId } from "@/lib/referral";
 
 /**
- * Compact capture for Coming Soon products. Without this, a Coming Soon page is
- * a dead end: someone interested has nothing to do but leave. Submits through
+ * Compact capture for any product that can't be ordered right now — sold out or
+ * not yet stocked. Without this, such a page is a dead end: someone interested
+ * has nothing to do but leave. Submits through
  * the same edge function as the full inquiry form, recorded as an
  * "availability" request so these are filterable in owner controls.
  */
@@ -18,6 +19,8 @@ export function AvailabilityNotify({ product }: { product: Product }) {
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+
+  const soldOut = product.status === "Sold Out";
 
   if (!backendReady) return null;
 
@@ -36,7 +39,9 @@ export function AvailabilityNotify({ product }: { product: Product }) {
           last_name: name.trim().split(/\s+/).slice(1).join(" ") || null,
           email: email.trim(),
           product: `${product.name} ${product.strength}`,
-          message: `Please let me know when ${product.name} ${product.strength} becomes available.`,
+          message: soldOut
+            ? `Please let me know when ${product.name} ${product.strength} is back in stock.`
+            : `Please let me know when ${product.name} ${product.strength} becomes available.`,
           referral_code: referral.toUpperCase().trim() || null,
           referral_captured: referralCaptured,
           visitor_id: visitorId() || null,
@@ -53,9 +58,11 @@ export function AvailabilityNotify({ product }: { product: Product }) {
 
   return (
     <div className="mt-8 rounded-lg border border-border bg-card p-6">
-      <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">Not yet available</p>
+      <p className="text-[0.68rem] tracking-[0.22em] text-accent uppercase">
+        {soldOut ? "Temporarily sold out" : "Not yet available"}
+      </p>
       <h2 className="mt-2 font-serif text-2xl text-primary">
-        Tell me when {product.name} arrives
+        Tell me when {product.name} {soldOut ? "is back" : "arrives"}
       </h2>
 
       {sent ? (

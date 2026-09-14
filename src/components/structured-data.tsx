@@ -62,7 +62,12 @@ export function ProductSchema({ product }: { product: Product }) {
         highPrice: Math.max(...singles),
         offerCount: priced.length,
         availability:
-          product.status === "In Stock" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          product.status === "In Stock"
+            ? "https://schema.org/InStock"
+            : product.status === "Sold Out"
+              ? // Signals to search engines that this returns, rather than that it is gone.
+                "https://schema.org/BackOrder"
+              : "https://schema.org/PreOrder",
         url,
       }
     : undefined;

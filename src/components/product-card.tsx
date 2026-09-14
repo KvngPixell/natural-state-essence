@@ -44,7 +44,11 @@ export function ProductCard({ product }: { product: Product }) {
           >
             View Product
           </Link>
-          {product.status === "In Stock" && <AddButton product={product} className="ml-auto" />}
+          {product.status === "In Stock" ? (
+            <AddButton product={product} className="ml-auto" />
+          ) : product.status === "Sold Out" ? (
+            <span className="ml-auto text-sm text-muted-foreground">Back in stock soon</span>
+          ) : null}
         </div>
       </div>
     </article>
