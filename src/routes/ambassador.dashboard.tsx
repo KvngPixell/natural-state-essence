@@ -6,6 +6,8 @@ import { usePortal } from "@/components/portal-context";
 import { db, rpc, money, pct, fmtDate, fmtMonth, button, outline, panel, publicSite, errorText } from "@/lib/backend";
 import type { AmbassadorDashboard } from "@/lib/program-types";
 import { Empty, Notice, Pill, Progress, Stat, TableWrap, td, th } from "@/components/program-ui";
+import { Digest, PersonalHeader, Signature, type DigestItem } from "@/components/personal";
+import { MILESTONES, awayPhrase, daysSince, lastVisitPhrase, timeGreeting } from "@/lib/personal";
 
 export const Route = createFileRoute("/ambassador/dashboard")({
   head: () => ({
@@ -76,37 +78,81 @@ function DashboardView({
     return [...set].sort().reverse();
   }, [data.month, data.statements]);
   const conversion = data.visitors > 0 ? Math.round((data.new_customers / data.visitors) * 1000) / 10 : null;
+  const away = daysSince(data.last_visit.since);
+  // Their own recent average order, used to turn "$312 to go" into something
+  // they can actually picture doing.
+  const avgOrder = (() => {
+    const vals = data.recent_sales.filter((s) => s.qualified_cents > 0).slice(0, 10).map((s) => s.qualified_cents);
+    return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+  })();
+  const toNext = rank.to_next_cents ?? 0;
+  const ordersToNext = avgOrder > 0 && toNext > 0 ? Math.ceil(toNext / avgOrder) : 0;
+  const backAfter = away != null && away >= 3 ? awayPhrase(away) : null;
+  const digestItems: DigestItem[] = [
+    { n: data.last_visit.clicks, one: "link click", many: "link clicks" },
+    { n: data.last_visit.visitors, one: "new visitor", many: "new visitors" },
+    { n: data.last_visit.inquiries, one: "inquiry", many: "inquiries" },
+    { n: data.last_visit.new_customers, one: "new customer", many: "new customers" },
+    { n: data.last_visit.orders, one: "order", many: "orders" },
+    {
+      n: data.last_visit.commission_cents,
+      one: "earned",
+      many: "earned",
+      display: money(data.last_visit.commission_cents),
+    },
+  ];
 
   return (
     <section className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-12">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0">
-          <p className="eyebrow">Natural State Ambassadors</p>
-          <h1 className="mt-3 font-serif text-4xl text-primary sm:text-5xl">Welcome, {data.profile.first_name}.</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Ambassador {data.profile.public_id} · Code <span className="font-medium text-primary">{data.profile.code}</span>
-          </p>
+      <PersonalHeader
+        eyebrow="Natural State Ambassadors"
+        greeting={`${timeGreeting()}, ${data.profile.first_name}.`}
+        subline={
+          <>
+            {backAfter && <span className="text-primary">Good to see you back — it's been {backAfter}. </span>}
+            {data.profile.start_date ? `Ambassador since ${fmtMonth(data.profile.start_date)} · ` : ""}
+            {data.profile.public_id} · Code{" "}
+            <span className="font-medium text-primary">{data.profile.code}</span>
+          </>
+        }
+        first={data.profile.first_name}
+        last={data.profile.last_name}
+        accent="gold"
+        actions={
+          <>
+            <label className="text-sm">
+              <span className="sr-only">Month</span>
+              <select
+                className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
+                value={month ?? data.month}
+                onChange={(e) => setMonth(e.target.value === months[0] ? null : e.target.value)}
+              >
+                {months.map((m) => (
+                  <option key={m} value={m}>
+                    {fmtMonth(m)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button className={outline} onClick={() => db?.auth.signOut()}>
+              Sign out
+            </button>
+          </>
+        }
+      />
+
+      <Milestones list={data.milestones} />
+
+      {/* Only on the current month — a digest next to a historical month reads as a contradiction. */}
+      {data.is_current_month && (
+        <div className="mt-6">
+          <Digest
+            since={lastVisitPhrase(data.last_visit.since)}
+            items={digestItems}
+            quiet="Nothing new since then. Share your link and it'll fill up."
+          />
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="text-sm">
-            <span className="sr-only">Month</span>
-            <select
-              className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm"
-              value={month ?? data.month}
-              onChange={(e) => setMonth(e.target.value === months[0] ? null : e.target.value)}
-            >
-              {months.map((m) => (
-                <option key={m} value={m}>
-                  {fmtMonth(m)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button className={outline} onClick={() => db?.auth.signOut()}>
-            Sign out
-          </button>
-        </div>
-      </div>
+      )}
 
       {!active && (
         <div className="mt-6">
@@ -140,6 +186,11 @@ function DashboardView({
                   value={data.qualified_cents - rank.min_cents}
                   max={rank.next_min_cents - rank.min_cents}
                 />
+                {ordersToNext > 0 && (
+                  <p className="mt-3 text-sm text-gold">
+                    About {ordersToNext} more order{ordersToNext === 1 ? "" : "s"} at your average gets you there.
+                  </p>
+                )}
               </>
             ) : (
               <p className="text-sm text-primary-foreground/85">Top rank reached this month.</p>
@@ -178,6 +229,13 @@ function DashboardView({
         <Stat label="Conversion rate" value={conversion == null ? "—" : conversion + "%"} sub="new customers ÷ visitors" />
         <Stat label="Lifetime qualifying revenue" value={money(data.lifetime_revenue_cents)} />
         <Stat label="Lifetime commission" value={money(data.lifetime_commission_cents)} sub={`${money(data.paid_to_date_cents)} paid to date`} />
+        {data.personal_best && (
+          <Stat
+            label="Your best month"
+            value={money(data.personal_best.qualified_cents)}
+            sub={`${fmtMonth(data.personal_best.month)}${data.personal_best.tier_name ? ` · ${data.personal_best.tier_name}` : ""}`}
+          />
+        )}
       </div>
 
       <ReferralTools code={data.profile.code} path={data.profile.referral_path} active={active} />
@@ -358,7 +416,51 @@ function DashboardView({
           </Link>
         </div>
       </div>
+
+      <div className="mt-14">
+        <Signature note={`${data.profile.first_name}, thank you for representing us well.`} />
+      </div>
     </section>
+  );
+}
+
+/**
+ * A milestone moment: shown once, acknowledged on dismissal, never seen again.
+ * Capped at two at a time so a first sign-in isn't a wall of banners.
+ */
+function Milestones({ list }: { list: AmbassadorDashboard["milestones"] }) {
+  const [dismissed, setDismissed] = useState<string[]>([]);
+  const shown = (list ?? []).filter((m) => MILESTONES[m.key] && !dismissed.includes(m.key)).slice(-2);
+  if (shown.length === 0) return null;
+
+  async function ack(key: string) {
+    setDismissed((d) => [...d, key]);
+    await rpc("nsp_ack_milestone", { p_key: key }).catch(() => {});
+  }
+
+  return (
+    <div className="mt-6 grid gap-3">
+      {shown.map((m) => {
+        const copy = MILESTONES[m.key]!;
+        return (
+          <div
+            key={m.key}
+            className="relative overflow-hidden rounded-2xl border border-gold/45 bg-[oklch(0.97_0.03_85)] p-5 sm:p-6"
+          >
+            <div className="rule-gold w-16" />
+            <p className="mt-3 font-serif text-2xl text-primary sm:text-3xl">{copy.title}</p>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-foreground/75">{copy.body}</p>
+            <button
+              type="button"
+              onClick={() => void ack(m.key)}
+              className="mt-4 text-sm text-gold-ink underline underline-offset-4 transition-opacity hover:opacity-70"
+            >
+              Nice — dismiss
+            </button>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 

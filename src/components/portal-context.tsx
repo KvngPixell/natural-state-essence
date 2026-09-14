@@ -6,6 +6,8 @@ import { captureReferral, storedReferral } from "@/lib/referral";
 export type Role = "owner" | "admin" | "ambassador" | null;
 interface Me {
   role: Role;
+  /** Display name for an owner/admin account, used to greet them by name. */
+  staff: { first_name: string | null; last_name: string | null; accent: string | null } | null;
   ambassador: { id: string; public_id: string; first_name: string; status: string } | null;
 }
 

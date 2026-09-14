@@ -3,6 +3,9 @@ import { OwnerContext, OWNER_TABS, LABELS, type OwnerCtx, type OwnerTab } from "
 export { OWNER_TABS, type OwnerTab } from "@/components/owner/owner-context";
 import { Plus } from "lucide-react";
 import { db, button, outline } from "@/lib/backend";
+import { usePortal } from "@/components/portal-context";
+import { PersonalHeader, Signature } from "@/components/personal";
+import { seasonNote, timeGreeting } from "@/lib/personal";
 import { RecordSale, type SalePrefill } from "@/components/owner/record-sale";
 import { Overview } from "@/components/owner/overview";
 import { Inquiries } from "@/components/owner/inquiries";
@@ -17,6 +20,8 @@ import { ProgramSettingsPanel } from "@/components/owner/settings";
 import { AuditLog } from "@/components/owner/audit";
 
 export function ControlCenter({ tab, setTab }: { tab: OwnerTab; setTab: (t: OwnerTab) => void }) {
+  const { me } = usePortal();
+  const staff = me?.staff ?? null;
   const [sale, setSale] = useState<{ open: boolean; prefill?: SalePrefill }>({ open: false });
   const [version, setVersion] = useState(0);
   const [focus, setFocus] = useState<{ tab: OwnerTab; id: string } | null>(null);
@@ -48,20 +53,30 @@ export function ControlCenter({ tab, setTab }: { tab: OwnerTab; setTab: (t: Owne
   return (
     <OwnerContext.Provider value={ctx}>
       <section className="mx-auto max-w-7xl px-4 pb-24 pt-8 sm:px-8 sm:pt-10">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="eyebrow">Natural State Peptides</p>
-            <h1 className="mt-2 font-serif text-3xl text-primary sm:text-5xl">Natural State Control Center</h1>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button className={button} onClick={() => ctx.recordSale()}>
-              <Plus className="size-4" /> Record sale
-            </button>
-            <button className={outline} onClick={() => db?.auth.signOut()}>
-              Sign out
-            </button>
-          </div>
-        </div>
+        <PersonalHeader
+          eyebrow="Natural State Control Center"
+          greeting={staff?.first_name ? `${timeGreeting()}, ${staff.first_name}.` : "Natural State Control Center"}
+          subline={
+            <>
+              {new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+              <span className="mx-2 text-border">·</span>
+              {seasonNote()}
+            </>
+          }
+          first={staff?.first_name}
+          last={staff?.last_name}
+          accent={staff?.accent}
+          actions={
+            <>
+              <button className={button} onClick={() => ctx.recordSale()}>
+                <Plus className="size-4" /> Record sale
+              </button>
+              <button className={outline} onClick={() => db?.auth.signOut()}>
+                Sign out
+              </button>
+            </>
+          }
+        />
         <nav
           aria-label="Control Center"
           className="sticky top-20 z-30 -mx-4 mt-6 overflow-x-auto border-y border-border bg-background/95 px-4 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:px-2"
@@ -87,6 +102,9 @@ export function ControlCenter({ tab, setTab }: { tab: OwnerTab; setTab: (t: Owne
           </ul>
         </nav>
         <div className="mt-6">{body}</div>
+        <div className="mt-16">
+          <Signature />
+        </div>
       </section>
       {/* Floating record-sale button for phones */}
       <button

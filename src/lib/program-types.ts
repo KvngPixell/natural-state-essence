@@ -12,7 +12,15 @@ export interface Tier {
 }
 
 export interface AmbassadorDashboard {
-  profile: { first_name: string; public_id: string; code: string; referral_path: string; status: AmbassadorStatus; start_date: string | null };
+  profile: {
+    first_name: string;
+    last_name: string | null;
+    public_id: string;
+    code: string;
+    referral_path: string;
+    status: AmbassadorStatus;
+    start_date: string | null;
+  };
   month: string;
   is_current_month: boolean;
   tiers: Tier[];
@@ -57,6 +65,20 @@ export interface AmbassadorDashboard {
   payouts: { paid_on: string; amount_cents: number; month: string; reference: string | null }[];
   statements: { month: string; tier_name: string | null; qualified_cents: number; final_cents: number; paid_cents: number; status: string }[];
   leaderboard: { position: number; label: string; tier_name: string; qualified_cents: number; is_me: boolean }[] | null;
+  /** What changed since their previous sign-in. `since` is null on a first visit. */
+  last_visit: {
+    since: string | null;
+    clicks: number;
+    visitors: number;
+    orders: number;
+    commission_cents: number;
+    new_customers: number;
+    inquiries: number;
+  };
+  /** Milestones reached but not yet acknowledged, oldest first. */
+  milestones: { key: string; achieved_at: string }[];
+  /** Their strongest month so far, by qualified revenue. */
+  personal_best: { month: string; qualified_cents: number; final_cents: number; tier_name: string | null } | null;
 }
 
 export interface CustomerSummary {
