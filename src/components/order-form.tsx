@@ -18,7 +18,7 @@ const money = (cents: number) => usd(cents / 100);
 
 export const FULFIL_OPTIONS = [
   ["pickup", "Local pickup", "Hot Springs area — we'll arrange a time"],
-  ["delivery", "Local delivery", "Hot Springs area — paid before we set out"],
+  ["delivery", "Local delivery", "Within 24 hours — paid before we set out"],
 ] as const;
 type Fulfil = (typeof FULFIL_OPTIONS)[number][0];
 
@@ -142,7 +142,9 @@ export function OrderForm({
             `Fulfilment: ${fulfilLabel}`,
             windows.length ? `Best times: ${windowSummary(windows)}` : "",
             availabilityNote.trim() ? "Availability: " + availabilityNote.trim() : "",
-            fulfil === "delivery" ? "Delivery — payment due up front." : "",
+            fulfil === "delivery"
+              ? "Delivery — payment due up front, out within 24 hours. Free within 10 miles of the Albert Pike Walmart, otherwise $10 minimum."
+              : "",
             notes.trim() ? "Notes: " + notes.trim() : "",
           ]
             .filter(Boolean)
@@ -342,8 +344,12 @@ export function OrderForm({
                   checked={fulfil === v}
                   onChange={() => {
                     setFulfil(v);
-                    // Cash can't be sent ahead, so switching to delivery clears it.
-                    if (v === "delivery" && payment === "cash") setPayment("");
+                    if (v === "delivery") {
+                      // Cash can't be sent ahead, and deliveries go out within
+                      // 24 hours rather than in a chosen slot.
+                      if (payment === "cash") setPayment("");
+                      setWindows([]);
+                    }
                   }}
                   className="sr-only"
                 />
@@ -356,49 +362,74 @@ export function OrderForm({
 
         <fieldset>
           <legend className="mb-1 text-sm font-medium text-primary">
-            When suits you for {fulfil === "delivery" ? "delivery" : "pickup"}?
+            {fulfil === "pickup" ? "When suits you for pickup?" : "Your delivery"}
           </legend>
-          <p className="mb-3 text-xs text-muted-foreground">
-            Pick as many windows as work — the more you choose, the quicker we can settle on a time. Optional.
-          </p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {TIME_WINDOWS.map(([v, label]) => {
-              const on = windows.includes(v);
-              return (
-                <label
-                  key={v}
-                  className={
-                    "flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2.5 text-sm transition-colors " +
-                    (on ? "border-primary bg-primary text-primary-foreground" : "border-border text-primary hover:border-accent")
-                  }
-                >
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    checked={on}
-                    onChange={() =>
-                      setWindows((w) => (w.includes(v) ? w.filter((x) => x !== v) : [...w, v]))
-                    }
-                  />
-                  {label}
-                </label>
-              );
-            })}
-          </div>
-          {windows.length > 0 && (
-            <p className="mt-3 text-xs text-muted-foreground">
-              We'll aim for <span className="text-primary">{windowSummary(windows)}</span>.
-            </p>
+
+          {/* Deliveries go out within 24 hours, so there is no slot to choose. */}
+          {fulfil === "pickup" ? (
+            <>
+              <p className="mb-3 text-xs text-muted-foreground">
+                Pick as many windows as work — the more you choose, the quicker we can settle on a time. Optional.
+              </p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {TIME_WINDOWS.map(([v, label]) => {
+                  const on = windows.includes(v);
+                  return (
+                    <label
+                      key={v}
+                      className={
+                        "flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2.5 text-sm transition-colors " +
+                        (on ? "border-primary bg-primary text-primary-foreground" : "border-border text-primary hover:border-accent")
+                      }
+                    >
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        checked={on}
+                        onChange={() =>
+                          setWindows((w) => (w.includes(v) ? w.filter((x) => x !== v) : [...w, v]))
+                        }
+                      />
+                      {label}
+                    </label>
+                  );
+                })}
+              </div>
+              {windows.length > 0 && (
+                <p className="mt-3 text-xs text-muted-foreground">
+                  We'll aim for <span className="text-primary">{windowSummary(windows)}</span>.
+                </p>
+              )}
+            </>
+          ) : (
+            <div className="mt-2 grid gap-2 rounded-lg border border-border bg-secondary/40 p-4 text-sm leading-relaxed text-foreground/80">
+              <p>
+                Delivered <span className="text-primary">within 24 hours</span> of your order being confirmed, so
+                there's no time slot to pick.
+              </p>
+              <p>
+                Free within 10 miles of the Walmart on Albert Pike Road in Hot Springs. Beyond that a{" "}
+                <span className="text-primary">$10 minimum delivery charge</span> applies — we'll confirm it with
+                your total before you pay anything.
+              </p>
+            </div>
           )}
+
           <label className="mt-4 grid gap-2 text-sm">
             <span className="text-muted-foreground">
-              Anything else about your availability? Optional — a short window, a day that's better, a heads-up to call first.
+              {fulfil === "pickup"
+                ? "Anything else about your availability? Optional — a short window, a day that's better, a heads-up to call first."
+                : "Anything we should know for the drop-off? Optional — an address note, a gate code, a heads-up to call first."}
             </span>
             <textarea
               rows={2}
               maxLength={400}
               className={field}
-              placeholder="e.g. only about 30 minutes around 12:30, or after 6pm works best on weekdays"
+              placeholder={
+                fulfil === "pickup"
+                  ? "e.g. only about 30 minutes around 12:30, or after 6pm works best on weekdays"
+                  : "e.g. leave with the front desk, or call when you're close"
+              }
               value={availabilityNote}
               onChange={(e) => setAvailabilityNote(e.target.value)}
             />

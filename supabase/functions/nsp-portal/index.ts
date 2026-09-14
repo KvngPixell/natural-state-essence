@@ -172,7 +172,8 @@ async function customerMail(id: string, mode: "receipt" | "confirmation") {
           when ? "  Times that suit you: " + when : "",
           note ? "  You added: " + note : "",
           pay ? "  Payment: " + pay + ", arranged directly with us" : "",
-          prepay ? "  Note: local deliveries are paid before we set out." : "",
+          prepay ? "  Delivered within 24 hours of confirmation, paid before we set out." : "",
+          prepay ? "  Free within 10 miles of the Walmart on Albert Pike Road; $10 minimum beyond that." : "",
           "  Reference: " + reference,
           "",
           "Just reply to this email if you need to change anything.",
@@ -196,12 +197,16 @@ async function customerMail(id: string, mode: "receipt" | "confirmation") {
           pay ? "  Payment: " + pay + ", arranged directly with us" : "",
           "",
           prepay
-            ? "Local deliveries are paid before we set out, so we'll send payment details first and " +
-              "book the drop once that clears."
+            ? "Your order goes out within 24 hours. Deliveries are paid before we set out, so we'll send " +
+              "payment details first and bring it to you once that clears. Delivery is free within 10 miles " +
+              "of the Walmart on Albert Pike Road; beyond that a $10 minimum charge applies, included in the " +
+              "total above."
             : "",
-          "We'll be in touch shortly to arrange " + handover +
-            (when ? ", aiming for " + when + "." : ".") +
-            " Reply to this email with any questions.",
+          prepay
+            ? "Reply to this email with any questions."
+            : "We'll be in touch shortly to arrange " + handover +
+              (when ? ", aiming for " + when + "." : ".") +
+              " Reply to this email with any questions.",
           "",
           "- Natural State Peptides",
           "",
@@ -288,7 +293,9 @@ async function sendNotice(id: string) {
             ? "Best time: " + windowText(r.preferred_windows)
             : "",
           r.kind === "order" && r.availability_note ? "They added: " + r.availability_note : "",
-          r.kind === "order" && r.fulfillment_method === "delivery" ? "** DELIVERY - COLLECT PAYMENT UP FRONT **" : "",
+          r.kind === "order" && r.fulfillment_method === "delivery"
+            ? "** DELIVERY - COLLECT PAYMENT UP FRONT, OUT WITHIN 24H. Check distance from the Albert Pike Walmart: $10 minimum beyond 10 miles. **"
+            : "",
           "Lot: " + (r.lot ?? ""),
           "Referral: " + (r.referral_code ?? ""),
           "",
