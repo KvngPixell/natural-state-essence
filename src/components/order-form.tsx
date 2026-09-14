@@ -18,9 +18,21 @@ const money = (cents: number) => usd(cents / 100);
 
 export const FULFIL_OPTIONS = [
   ["pickup", "Local pickup", "Hot Springs area — we'll arrange a time"],
-  ["delivery", "Local delivery", "Within 24 hours — paid before we set out"],
+  ["delivery", "Local delivery", "Within 24 hours — $10, free over $300"],
 ] as const;
 type Fulfil = (typeof FULFIL_OPTIONS)[number][0];
+
+/** Local delivery terms. Kept here so the form, the estimate and the copy agree. */
+export const DELIVERY_FEE_CENTS = 1000;
+/** Below this, delivery isn't offered at all. */
+export const DELIVERY_MIN_CENTS = 17500;
+/** At or above this, the fee is waived. */
+export const DELIVERY_FREE_CENTS = 30000;
+export const DELIVERY_RADIUS_MILES = 10;
+export const DELIVERY_ORIGIN = "the Walmart on Albert Pike Road in Hot Springs";
+/** What a given goods subtotal pays for delivery: nothing, flat fee, or free. */
+export const deliveryFeeFor = (subtotalCents: number) =>
+  subtotalCents >= DELIVERY_FREE_CENTS ? 0 : DELIVERY_FEE_CENTS;
 
 /**
  * Two-hour handover windows. Several can be picked: one two-hour slot is often
@@ -95,9 +107,18 @@ export function OrderForm({
     },
     { cents: 0, quoted: false },
   );
-  const fulfilLabel = FULFIL_OPTIONS.find(([v]) => v === fulfil)?.[1] ?? "";
+  // Delivery is only offered once the order clears the minimum. Anything that
+  // still needs quoting doesn't count toward it, so the gate is never opened by
+  // a price we haven't actually published.
+  const deliveryEligible = estimate.cents >= DELIVERY_MIN_CENTS;
+  const effectiveFulfil: Fulfil = fulfil === "delivery" && !deliveryEligible ? "pickup" : fulfil;
+  const fulfilOptions = FULFIL_OPTIONS.filter(([v]) => v !== "delivery" || deliveryEligible);
+  const fulfilLabel = FULFIL_OPTIONS.find(([v]) => v === effectiveFulfil)?.[1] ?? "";
+  const deliveryFee = effectiveFulfil === "delivery" ? deliveryFeeFor(estimate.cents) : 0;
+  const deliveryIsFree = effectiveFulfil === "delivery" && deliveryFee === 0;
+  const grandTotal = estimate.cents + deliveryFee;
   // Deliveries are paid before we set out, so cash-on-the-doorstep is not offered.
-  const payMethods = fulfil === "delivery" ? PAYMENT_CHOICES.filter((m) => m.value !== "cash") : PAYMENT_CHOICES;
+  const payMethods = effectiveFulfil === "delivery" ? PAYMENT_CHOICES.filter((m) => m.value !== "cash") : PAYMENT_CHOICES;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -130,7 +151,7 @@ export function OrderForm({
           order_items: items,
           payment_method: payment,
           payment_other: null,
-          fulfillment_method: fulfil,
+          fulfillment_method: effectiveFulfil,
           preferred_windows: windows.length ? [...windows].sort() : null,
           availability_note: availabilityNote.trim() || null,
           research_ack: true,
@@ -138,12 +159,16 @@ export function OrderForm({
             "Order request:",
             summary,
             `Payment: ${payLabel}`,
-            estimate.cents > 0 ? `Estimated total: ${money(estimate.cents)}${estimate.quoted ? " + items to quote" : ""}` : "",
+            estimate.cents > 0 ? `Estimated subtotal: ${money(estimate.cents)}${estimate.quoted ? " + items to quote" : ""}` : "",
+            effectiveFulfil === "delivery"
+              ? `Delivery fee: ${deliveryIsFree ? "free (order over " + money(DELIVERY_FREE_CENTS) + ")" : money(deliveryFee)}`
+              : "",
+            grandTotal > 0 ? `Estimated total: ${money(grandTotal)}${estimate.quoted ? " + items to quote" : ""}` : "",
             `Fulfilment: ${fulfilLabel}`,
             windows.length ? `Best times: ${windowSummary(windows)}` : "",
             availabilityNote.trim() ? "Availability: " + availabilityNote.trim() : "",
-            fulfil === "delivery"
-              ? "Delivery — payment due up front, out within 24 hours. Free within 10 miles of the Albert Pike Walmart, otherwise $10 minimum."
+            effectiveFulfil === "delivery"
+              ? `Delivery — paid up front, out within 24 hours. Within ${DELIVERY_RADIUS_MILES} miles of ${DELIVERY_ORIGIN} only.`
               : "",
             notes.trim() ? "Notes: " + notes.trim() : "",
           ]
@@ -186,12 +211,12 @@ export function OrderForm({
         <p className="mt-4 text-sm leading-relaxed text-foreground/75">
           Your request <strong>#{done}</strong> is with our team. We'll reach out within 24 hours by phone or
           email to confirm availability and your total, and arrange {PAYMENT_CHOICES.find((m) => m.value === payment)?.label}
-          {fulfil === "pickup" ? " and a pickup time" : " and local delivery"}. Nothing has been charged, and
+          {effectiveFulfil === "pickup" ? " and a pickup time" : " and local delivery"}. Nothing has been charged, and
           nothing is final until we confirm it with you.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-foreground/75">
           A copy is on its way to <strong>{email.trim()}</strong>
-          {fulfil === "delivery" ? ". Local deliveries are paid before we set out, so we'll send payment details first." : "."}
+          {effectiveFulfil === "delivery" ? ". Local deliveries are paid before we set out, so we'll send payment details first." : "."}
         </p>
       </div>
     );
@@ -281,21 +306,47 @@ export function OrderForm({
               <Plus className="size-4" /> Add another product
             </button>
           )}
+          {effectiveFulfil === "delivery" && (
+            <>
+              <div className="mt-1 flex flex-wrap items-baseline justify-between gap-2 border-t border-border pt-3 text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="tabular-nums text-primary">{money(estimate.cents)}</span>
+              </div>
+              <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
+                <span className="text-muted-foreground">Local delivery</span>
+                <span className={deliveryIsFree ? "text-accent" : "tabular-nums text-primary"}>
+                  {deliveryIsFree ? "Free" : money(deliveryFee)}
+                </span>
+              </div>
+            </>
+          )}
           <div className="mt-1 flex flex-wrap items-baseline justify-between gap-2 border-t border-border pt-3">
             <span className="text-sm text-muted-foreground">
               Estimated total{estimate.quoted ? " (plus items we'll quote)" : ""}
             </span>
-            <span className="font-serif text-2xl text-primary tabular-nums">{money(estimate.cents)}</span>
+            <span className="font-serif text-2xl text-primary tabular-nums">{money(grandTotal)}</span>
           </div>
           <p className="text-xs text-muted-foreground">
             Prices cover 1–{MAX_PRICED_QTY} vials of each item. For larger quantities we'll confirm your price. Your
             final total is confirmed by our team before you pay.
           </p>
+          {!deliveryEligible ? (
+            <p className="text-xs text-muted-foreground">
+              Local delivery is available on orders of{" "}
+              <span className="text-primary">{money(DELIVERY_MIN_CENTS)}</span> or more
+              {estimate.cents > 0 ? ` — ${money(DELIVERY_MIN_CENTS - estimate.cents)} away.` : "."}
+            </p>
+          ) : estimate.cents < DELIVERY_FREE_CENTS ? (
+            <p className="text-xs text-muted-foreground">
+              Add <span className="text-primary">{money(DELIVERY_FREE_CENTS - estimate.cents)}</span> more and local
+              delivery is free.
+            </p>
+          ) : null}
         </fieldset>
 
         <fieldset>
           <legend className="mb-1 text-sm font-medium text-primary">How do you plan to pay?</legend>
-          {fulfil === "delivery" ? (
+          {effectiveFulfil === "delivery" ? (
             <p className="mb-3 text-xs text-muted-foreground">
               Local deliveries are <span className="text-primary">paid before we set out</span>, so cash on the
               doorstep isn't an option — pick a method you can send ahead.
@@ -329,19 +380,19 @@ export function OrderForm({
         <fieldset>
           <legend className="mb-3 text-sm font-medium text-primary">Pickup or local delivery</legend>
           <div className="grid gap-2 sm:grid-cols-2">
-            {FULFIL_OPTIONS.map(([v, label, sub]) => (
+            {fulfilOptions.map(([v, label, sub]) => (
               <label
                 key={v}
                 className={
                   "flex cursor-pointer flex-col rounded-lg border px-4 py-3 text-sm transition-colors " +
-                  (fulfil === v ? "border-primary bg-secondary/60" : "border-border hover:border-accent")
+                  (effectiveFulfil === v ? "border-primary bg-secondary/60" : "border-border hover:border-accent")
                 }
               >
                 <input
                   type="radio"
                   name="fulfil"
                   value={v}
-                  checked={fulfil === v}
+                  checked={effectiveFulfil === v}
                   onChange={() => {
                     setFulfil(v);
                     if (v === "delivery") {
@@ -362,11 +413,11 @@ export function OrderForm({
 
         <fieldset>
           <legend className="mb-1 text-sm font-medium text-primary">
-            {fulfil === "pickup" ? "When suits you for pickup?" : "Your delivery"}
+            {effectiveFulfil === "pickup" ? "When suits you for pickup?" : "Your delivery"}
           </legend>
 
           {/* Deliveries go out within 24 hours, so there is no slot to choose. */}
-          {fulfil === "pickup" ? (
+          {effectiveFulfil === "pickup" ? (
             <>
               <p className="mb-3 text-xs text-muted-foreground">
                 Pick as many windows as work — the more you choose, the quicker we can settle on a time. Optional.
@@ -408,16 +459,28 @@ export function OrderForm({
                 there's no time slot to pick.
               </p>
               <p>
-                Free within 10 miles of the Walmart on Albert Pike Road in Hot Springs. Beyond that a{" "}
-                <span className="text-primary">$10 minimum delivery charge</span> applies — we'll confirm it with
-                your total before you pay anything.
+                Available within <span className="text-primary">{DELIVERY_RADIUS_MILES} miles</span> of{" "}
+                {DELIVERY_ORIGIN}. If you're outside that radius we'll let you know and switch you to pickup.
+              </p>
+              <p>
+                {deliveryIsFree ? (
+                  <>
+                    Delivery on this order is <span className="text-accent">free</span> — orders over{" "}
+                    {money(DELIVERY_FREE_CENTS)} qualify.
+                  </>
+                ) : (
+                  <>
+                    <span className="text-primary">{money(DELIVERY_FEE_CENTS)} flat fee</span>, added to your total.
+                    Free on orders over {money(DELIVERY_FREE_CENTS)}.
+                  </>
+                )}
               </p>
             </div>
           )}
 
           <label className="mt-4 grid gap-2 text-sm">
             <span className="text-muted-foreground">
-              {fulfil === "pickup"
+              {effectiveFulfil === "pickup"
                 ? "Anything else about your availability? Optional — a short window, a day that's better, a heads-up to call first."
                 : "Anything we should know for the drop-off? Optional — an address note, a gate code, a heads-up to call first."}
             </span>
@@ -426,7 +489,7 @@ export function OrderForm({
               maxLength={400}
               className={field}
               placeholder={
-                fulfil === "pickup"
+                effectiveFulfil === "pickup"
                   ? "e.g. only about 30 minutes around 12:30, or after 6pm works best on weekdays"
                   : "e.g. leave with the front desk, or call when you're close"
               }

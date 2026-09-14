@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { renderEmail } from "./email.ts";
 const env = (name: string) => Deno.env.get(name) ?? "";
 const service = createClient(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"), {
   auth: { persistSession: false },
@@ -32,7 +33,17 @@ const FULFIL_LABEL: Record<string, string> = {
   delivery: "Local delivery",
   ship: "Ship",
 };
+// Local delivery terms. Mirrors src/components/order-form.tsx — change both.
+const DELIVERY_FEE_CENTS = 1000;
+const DELIVERY_MIN_CENTS = 17500;
+const DELIVERY_FREE_CENTS = 30000;
+const DELIVERY_RADIUS_MILES = 10;
+const DELIVERY_ORIGIN = "the Walmart on Albert Pike Road in Hot Springs";
+const deliveryFeeFor = (subtotalCents: number) =>
+  subtotalCents >= DELIVERY_FREE_CENTS ? 0 : DELIVERY_FEE_CENTS;
+
 // Two-hour handover windows, keyed by start-end hour in 24h local time.
+// Pickup only — deliveries go out within 24 hours rather than in a chosen slot.
 const WINDOWS = ["07-09", "09-11", "11-13", "13-15", "15-17", "17-19", "19-21", "21-23"];
 const WINDOW_LABEL: Record<string, string> = {
   "07-09": "7-9am",
@@ -69,8 +80,6 @@ const RESEARCH_NOTICE =
   "All products are supplied for laboratory research use only. They are not drugs, supplements or " +
   "cosmetics, and are not supplied for human or animal use. No dosing or administration guidance is provided.";
 
-const dollars = (c: number) => "$" + (c / 100).toLocaleString("en-US", { maximumFractionDigits: 2 });
-
 /**
  * Customer-facing order email. `mode` is "receipt" — sent the moment an order
  * request arrives — or "confirmation", sent once an owner accepts it.
@@ -106,7 +115,8 @@ async function customerMail(id: string, mode: "receipt" | "confirmation") {
   // over the browser's estimates, so the customer sees what they actually owe.
   let reference = id.slice(0, 8).toUpperCase();
   let lines: { name: string; quantity: number; cents: number | null }[] = [];
-  let total: number | null = null;
+  // The delivery charge as actually recorded on the order, once one exists.
+  let confirmedFee: number | null = null;
   let estimated = true;
 
   if (mode === "confirmation" && r.order_id) {
@@ -117,7 +127,7 @@ async function customerMail(id: string, mode: "receipt" | "confirmation") {
       .eq("order_id", r.order_id);
     if (o) {
       reference = o.public_id ?? reference;
-      total = o.product_paid_cents ?? null;
+      confirmedFee = typeof o.shipping_cents === "number" ? o.shipping_cents : null;
       estimated = false;
       lines = (items ?? []).map((i) => ({
         name: i.product_name,
@@ -131,87 +141,34 @@ async function customerMail(id: string, mode: "receipt" | "confirmation") {
       ? r.order_items
       : [];
     lines = raw.map((i) => ({ name: i.name, quantity: i.quantity, cents: i.est_cents ?? null }));
-    const priced = lines.filter((l) => typeof l.cents === "number");
-    total = priced.length === lines.length && lines.length > 0 ? priced.reduce((a, l) => a + (l.cents as number), 0) : null;
   }
 
-  const itemText = lines
-    .map((l) => "  " + l.quantity + " x " + l.name + (typeof l.cents === "number" ? " - " + dollars(l.cents) : ""))
-    .join("\n");
-  const totalText =
-    total == null
-      ? "  Total: we'll confirm this with you"
-      : "  Total: " + dollars(total) + (estimated ? " (estimated)" : "");
-  const first = (r.first_name ?? r.name ?? "").split(/\s+/)[0] || "there";
-  const fulfil = FULFIL_LABEL[r.fulfillment_method] ?? "Local pickup";
-  const pay = PAYMENT_LABEL[r.payment_method] ?? "";
-  const handover = r.fulfillment_method === "delivery" ? "delivery" : "pickup";
-  const when = windowText(r.preferred_windows);
-  const note = typeof r.availability_note === "string" && r.availability_note.trim() ? r.availability_note.trim() : null;
-  // Deliveries are settled before we set out; pickup is paid at the handover.
-  const prepay = r.fulfillment_method === "delivery";
+  const subtotal = lines.reduce((a, l) => a + (typeof l.cents === "number" ? l.cents : 0), 0);
+  const anyPriced = lines.some((l) => typeof l.cents === "number");
+  const deliveryFee =
+    r.fulfillment_method === "delivery" ? (confirmedFee ?? deliveryFeeFor(subtotal)) : 0;
+  const totalCents = anyPriced ? subtotal + deliveryFee : null;
 
-  const subject =
-    mode === "receipt"
-      ? "We've got your request - Natural State Peptides"
-      : "Your order is confirmed - Natural State Peptides";
-
-  const body =
-    mode === "receipt"
-      ? [
-          "Hi " + first + ",",
-          "",
-          "Thanks - your request reached us and we're looking at it now. Nothing has been charged, and",
-          "nothing is sent automatically. We'll come back to you to confirm before anything happens.",
-          "",
-          "What you asked for",
-          itemText,
-          totalText,
-          "",
-          "  Collection: " + fulfil + " in the Hot Springs, Arkansas area",
-          when ? "  Times that suit you: " + when : "",
-          note ? "  You added: " + note : "",
-          pay ? "  Payment: " + pay + ", arranged directly with us" : "",
-          prepay ? "  Delivered within 24 hours of confirmation, paid before we set out." : "",
-          prepay ? "  Free within 10 miles of the Walmart on Albert Pike Road; $10 minimum beyond that." : "",
-          "  Reference: " + reference,
-          "",
-          "Just reply to this email if you need to change anything.",
-          "",
-          "- Natural State Peptides",
-          "",
-          RESEARCH_NOTICE,
-        ]
-      : [
-          "Hi " + first + ",",
-          "",
-          "Good news - your order has been accepted and is in process.",
-          "",
-          "  Order " + reference,
-          itemText,
-          totalText,
-          "",
-          "  Collection: " + fulfil + " in the Hot Springs, Arkansas area",
-          when ? "  Times that suit you: " + when : "",
-          note ? "  You added: " + note : "",
-          pay ? "  Payment: " + pay + ", arranged directly with us" : "",
-          "",
-          prepay
-            ? "Your order goes out within 24 hours. Deliveries are paid before we set out, so we'll send " +
-              "payment details first and bring it to you once that clears. Delivery is free within 10 miles " +
-              "of the Walmart on Albert Pike Road; beyond that a $10 minimum charge applies, included in the " +
-              "total above."
-            : "",
-          prepay
-            ? "Reply to this email with any questions."
-            : "We'll be in touch shortly to arrange " + handover +
-              (when ? ", aiming for " + when + "." : ".") +
-              " Reply to this email with any questions.",
-          "",
-          "- Natural State Peptides",
-          "",
-          RESEARCH_NOTICE,
-        ];
+  const rendered = renderEmail({
+    stage: mode === "confirmation" ? "confirmed" : "received",
+    firstName: (r.first_name ?? r.name ?? "").split(/\s+/)[0] || "there",
+    requestRef: reference,
+    items: lines,
+    subtotalCents: anyPriced ? subtotal : null,
+    deliveryFeeCents: deliveryFee,
+    totalCents,
+    estimated,
+    fulfilment: r.fulfillment_method === "delivery" ? "delivery" : "pickup",
+    windows: windowText(r.preferred_windows),
+    note: typeof r.availability_note === "string" && r.availability_note.trim()
+      ? r.availability_note.trim()
+      : null,
+    paymentLabel: PAYMENT_LABEL[r.payment_method] ?? "To be arranged",
+    deliveryRadiusMiles: DELIVERY_RADIUS_MILES,
+    deliveryOrigin: DELIVERY_ORIGIN,
+    complianceLine: env("COMPLIANCE_LINE") || RESEARCH_NOTICE,
+    logoUrl: env("EMAIL_LOGO_URL") || null,
+  });
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -226,8 +183,9 @@ async function customerMail(id: string, mode: "receipt" | "confirmation") {
         from: env("EMAIL_FROM"),
         to: [r.email],
         ...(env("INQUIRY_TO") ? { reply_to: env("INQUIRY_TO") } : {}),
-        subject,
-        text: body.filter((l) => l !== "").join("\n").replace(/\n{3,}/g, "\n\n"),
+        subject: rendered.subject,
+        html: rendered.html,
+        text: rendered.text,
       }),
     });
     if (!res.ok) throw new Error("Provider rejected the message");
@@ -294,7 +252,9 @@ async function sendNotice(id: string) {
             : "",
           r.kind === "order" && r.availability_note ? "They added: " + r.availability_note : "",
           r.kind === "order" && r.fulfillment_method === "delivery"
-            ? "** DELIVERY - COLLECT PAYMENT UP FRONT, OUT WITHIN 24H. Check distance from the Albert Pike Walmart: $10 minimum beyond 10 miles. **"
+            ? "** DELIVERY - COLLECT PAYMENT UP FRONT, OUT WITHIN 24H. Within " + DELIVERY_RADIUS_MILES +
+              " miles of " + DELIVERY_ORIGIN + " only. Fee: " +
+              (estTotal >= DELIVERY_FREE_CENTS ? "free (order over $300)" : "$10") + " **"
             : "",
           "Lot: " + (r.lot ?? ""),
           "Referral: " + (r.referral_code ?? ""),
@@ -355,8 +315,17 @@ function validSubmission(b: Record<string, unknown>) {
       if (b.preferred_windows.some((w) => !WINDOWS.includes(String(w)))) return false;
     }
     if (!str(b.availability_note, 400)) return false;
-    // Deliveries are paid before we set out, so a cash handover can't apply to one.
-    if (b.fulfillment_method === "delivery" && b.payment_method === "cash") return false;
+    if (b.fulfillment_method === "delivery") {
+      // Deliveries are paid before we set out, so cash can't apply to one, and
+      // they are only offered above the minimum order. Enforced here as well as
+      // in the form so an edited payload cannot buy its way past either rule.
+      if (b.payment_method === "cash") return false;
+      const sub = (items as Record<string, unknown>[]).reduce(
+        (a, i) => a + (typeof i.est_cents === "number" ? i.est_cents : 0),
+        0,
+      );
+      if (sub < DELIVERY_MIN_CENTS) return false;
+    }
     if (b.research_ack !== true) return false;
     if (typeof b.phone !== "string" || b.phone.replace(/\D/g, "").length < 7) return false;
   }
