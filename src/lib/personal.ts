@@ -101,33 +101,56 @@ export const ACCENTS: Record<string, { chip: string; ring: string }> = {
 };
 export const accentOf = (key?: string | null) => ACCENTS[key ?? ""] ?? ACCENTS["forest"]!;
 
-/** Turns an audit action plus its actor into a sentence: "Daniel recorded a sale". */
+/**
+ * Every action name the audit log actually writes, mapped to a readable
+ * predicate. Keep this in step with the `nsp_log(...)` calls in the migrations —
+ * note that two of them build the name dynamically, as `ambassador_<status>`
+ * and `commission_<status>`, so each status needs its own entry.
+ */
+const ACTION_PHRASES: Record<string, string> = {
+  sale_recorded: "recorded a sale",
+  sale_updated: "updated a sale",
+  sale_status_changed: "changed a sale's status",
+  sale_refunded: "recorded a refund",
+  customer_created: "added a customer",
+  customer_updated: "updated a customer",
+  customers_merged: "merged two customers",
+  customer_flagged: "flagged a duplicate",
+  attribution_corrected: "corrected an attribution",
+  ambassador_created: "added an ambassador",
+  ambassador_updated: "updated an ambassador",
+  ambassador_pending: "set an ambassador back to pending",
+  ambassador_active: "activated an ambassador",
+  ambassador_inactive: "made an ambassador inactive",
+  ambassador_suspended: "suspended an ambassador",
+  ambassador_archived: "archived an ambassador",
+  ambassador_link_prepared: "prepared an ambassador's sign-in link",
+  ambassador_access_prepared: "prepared an ambassador's access",
+  application_approved: "approved an application",
+  application_declined: "declined an application",
+  commission_pending: "reopened a statement",
+  commission_approved: "approved a statement",
+  commission_held: "put a statement on hold",
+  commission_paid: "marked a statement paid",
+  commission_cancelled: "cancelled a statement",
+  commission_adjusted: "adjusted a statement",
+  request_status: "updated a request",
+  settings_changed: "changed the program settings",
+};
+
+/** "Record sale" → "Record sale" as a heading-style label. */
+export const actionTitle = (action: string) =>
+  action.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+
+/**
+ * Turns an audit action plus its actor into a sentence: "Daniel recorded a
+ * sale". An action with no mapped phrase still reads cleanly — it falls back to
+ * "Daniel · Added lot note" rather than an ungrammatical "Daniel added lot note".
+ */
 export function activitySentence(action: string, actorName?: string | null, isMe?: boolean): string {
-  const verb = action.replace(/_/g, " ");
   const who = isMe ? "You" : (actorName ?? "Someone");
-  const phrase: Record<string, string> = {
-    sale_recorded: "recorded a sale",
-    sale_updated: "updated a sale",
-    sale_status_changed: "changed a sale's status",
-    sale_refunded: "recorded a refund",
-    customer_saved: "saved a customer",
-    customers_merged: "merged two customers",
-    customer_flagged: "flagged a duplicate",
-    attribution_corrected: "corrected an attribution",
-    ambassador_saved: "saved an ambassador",
-    ambassador_status_changed: "changed an ambassador's status",
-    ambassador_link_prepared: "prepared an ambassador's sign-in link",
-    application_approved: "approved an application",
-    application_declined: "declined an application",
-    statement_approved: "approved a statement",
-    statement_held: "put a statement on hold",
-    statement_reopened: "reopened a statement",
-    payout_recorded: "recorded a payout",
-    adjustment_added: "added an adjustment",
-    settings_saved: "changed the program settings",
-    request_status_changed: "updated a request",
-  };
-  return `${who} ${phrase[action] ?? verb}`;
+  const phrase = ACTION_PHRASES[action];
+  return phrase ? `${who} ${phrase}` : `${who} · ${actionTitle(action)}`;
 }
 
 /** Ambassador milestone copy. Keys match nsp_partner_milestones.key. */
