@@ -3,7 +3,7 @@ import { Minus, Plus, X } from "lucide-react";
 import { skus, getSku, priceCents, usd, MAX_PRICED_QTY } from "@/data/products";
 import { usePortal } from "@/components/portal-context";
 import { useCart } from "@/components/cart-context";
-import { backendReady, edge, field, button, outline, errorText, PAYMENT_METHODS } from "@/lib/backend";
+import { backendReady, edge, field, button, outline, errorText, PAYMENT_CHOICES } from "@/lib/backend";
 import { checkCode, visitorId } from "@/lib/referral";
 
 /**
@@ -18,9 +18,33 @@ const money = (cents: number) => usd(cents / 100);
 
 export const FULFIL_OPTIONS = [
   ["pickup", "Local pickup", "Hot Springs area — we'll arrange a time"],
-  ["delivery", "Local delivery", "Hot Springs area — we'll confirm the details"],
+  ["delivery", "Local delivery", "Hot Springs area — paid before we set out"],
 ] as const;
 type Fulfil = (typeof FULFIL_OPTIONS)[number][0];
+
+/**
+ * Two-hour handover windows. Several can be picked: one two-hour slot is often
+ * too tight to be useful, and a couple of options settles a meeting time in a
+ * single message instead of three.
+ */
+export const TIME_WINDOWS = [
+  ["07-09", "7–9am"],
+  ["09-11", "9–11am"],
+  ["11-13", "11am–1pm"],
+  ["13-15", "1–3pm"],
+  ["15-17", "3–5pm"],
+  ["17-19", "5–7pm"],
+  ["19-21", "7–9pm"],
+  ["21-23", "9–11pm"],
+] as const;
+export const windowLabel = (key: string) => TIME_WINDOWS.find(([v]) => v === key)?.[1] ?? key;
+/** "9–11am or 5–7pm" — reads the way a person would say it. */
+export function windowSummary(keys: readonly string[]): string {
+  const labels = [...keys].sort().map(windowLabel);
+  if (labels.length === 0) return "";
+  if (labels.length === 1) return labels[0]!;
+  return labels.slice(0, -1).join(", ") + " or " + labels[labels.length - 1];
+}
 
 interface Line {
   slug: string;
@@ -47,8 +71,9 @@ export function OrderForm({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [payment, setPayment] = useState("");
-  const [paymentOther, setPaymentOther] = useState("");
   const [fulfil, setFulfil] = useState<Fulfil>("pickup");
+  const [windows, setWindows] = useState<string[]>([]);
+  const [availabilityNote, setAvailabilityNote] = useState("");
   const [notes, setNotes] = useState("");
   const [ack, setAck] = useState(false);
   const [code, setCode] = useState("");
@@ -71,12 +96,13 @@ export function OrderForm({
     { cents: 0, quoted: false },
   );
   const fulfilLabel = FULFIL_OPTIONS.find(([v]) => v === fulfil)?.[1] ?? "";
+  // Deliveries are paid before we set out, so cash-on-the-doorstep is not offered.
+  const payMethods = fulfil === "delivery" ? PAYMENT_CHOICES.filter((m) => m.value !== "cash") : PAYMENT_CHOICES;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     if (!payment) return setError("Choose how you plan to pay.");
-    if (payment === "other" && !paymentOther.trim()) return setError("Tell us which payment method you'd like to use.");
     if (!ack) return setError("Please confirm the research-use statement.");
     const items = lines
       .map((l) => ({ l, s: getSku(l.slug) }))
@@ -87,7 +113,7 @@ export function OrderForm({
     const summary = items
       .map((i) => `${i.quantity} × ${i.name}${i.est_cents != null ? ` — est. ${money(i.est_cents)}` : " — quote needed"}`)
       .join("\n");
-    const payLabel = PAYMENT_METHODS.find((m) => m.value === payment)?.label ?? payment;
+    const payLabel = PAYMENT_CHOICES.find((m) => m.value === payment)?.label ?? payment;
     setBusy(true);
     try {
       const result = await edge({
@@ -103,15 +129,20 @@ export function OrderForm({
           product: items.length === 1 ? items[0].name : `${items.length} products`,
           order_items: items,
           payment_method: payment,
-          payment_other: payment === "other" ? paymentOther.trim() : null,
+          payment_other: null,
           fulfillment_method: fulfil,
+          preferred_windows: windows.length ? [...windows].sort() : null,
+          availability_note: availabilityNote.trim() || null,
           research_ack: true,
           message: [
             "Order request:",
             summary,
-            `Payment: ${payLabel}${payment === "other" ? " (" + paymentOther.trim() + ")" : ""}`,
+            `Payment: ${payLabel}`,
             estimate.cents > 0 ? `Estimated total: ${money(estimate.cents)}${estimate.quoted ? " + items to quote" : ""}` : "",
             `Fulfilment: ${fulfilLabel}`,
+            windows.length ? `Best times: ${windowSummary(windows)}` : "",
+            availabilityNote.trim() ? "Availability: " + availabilityNote.trim() : "",
+            fulfil === "delivery" ? "Delivery — payment due up front." : "",
             notes.trim() ? "Notes: " + notes.trim() : "",
           ]
             .filter(Boolean)
@@ -152,9 +183,13 @@ export function OrderForm({
         <h2 className="mt-2 font-serif text-3xl text-primary">Thank you, {first.trim()}.</h2>
         <p className="mt-4 text-sm leading-relaxed text-foreground/75">
           Your request <strong>#{done}</strong> is with our team. We'll reach out within 24 hours by phone or
-          email to confirm availability and your total, and arrange {PAYMENT_METHODS.find((m) => m.value === payment)?.label}
+          email to confirm availability and your total, and arrange {PAYMENT_CHOICES.find((m) => m.value === payment)?.label}
           {fulfil === "pickup" ? " and a pickup time" : " and local delivery"}. Nothing has been charged, and
           nothing is final until we confirm it with you.
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-foreground/75">
+          A copy is on its way to <strong>{email.trim()}</strong>
+          {fulfil === "delivery" ? ". Local deliveries are paid before we set out, so we'll send payment details first." : "."}
         </p>
       </div>
     );
@@ -257,9 +292,17 @@ export function OrderForm({
         </fieldset>
 
         <fieldset>
-          <legend className="mb-3 text-sm font-medium text-primary">How do you plan to pay?</legend>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-            {PAYMENT_METHODS.map((m) => (
+          <legend className="mb-1 text-sm font-medium text-primary">How do you plan to pay?</legend>
+          {fulfil === "delivery" ? (
+            <p className="mb-3 text-xs text-muted-foreground">
+              Local deliveries are <span className="text-primary">paid before we set out</span>, so cash on the
+              doorstep isn't an option — pick a method you can send ahead.
+            </p>
+          ) : (
+            <p className="mb-3 text-xs text-muted-foreground">Payment is arranged directly with us, never on this site.</p>
+          )}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {payMethods.map((m) => (
               <label
                 key={m.value}
                 className={
@@ -279,16 +322,6 @@ export function OrderForm({
               </label>
             ))}
           </div>
-          {payment === "other" && (
-            <input
-              aria-label="Other payment method"
-              placeholder="Which method?"
-              maxLength={100}
-              className={field + " mt-3"}
-              value={paymentOther}
-              onChange={(e) => setPaymentOther(e.target.value)}
-            />
-          )}
         </fieldset>
 
         <fieldset>
@@ -302,12 +335,74 @@ export function OrderForm({
                   (fulfil === v ? "border-primary bg-secondary/60" : "border-border hover:border-accent")
                 }
               >
-                <input type="radio" name="fulfil" value={v} checked={fulfil === v} onChange={() => setFulfil(v)} className="sr-only" />
+                <input
+                  type="radio"
+                  name="fulfil"
+                  value={v}
+                  checked={fulfil === v}
+                  onChange={() => {
+                    setFulfil(v);
+                    // Cash can't be sent ahead, so switching to delivery clears it.
+                    if (v === "delivery" && payment === "cash") setPayment("");
+                  }}
+                  className="sr-only"
+                />
                 <span className="font-medium text-primary">{label}</span>
                 <span className="text-xs text-muted-foreground">{sub}</span>
               </label>
             ))}
           </div>
+        </fieldset>
+
+        <fieldset>
+          <legend className="mb-1 text-sm font-medium text-primary">
+            When suits you for {fulfil === "delivery" ? "delivery" : "pickup"}?
+          </legend>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Pick as many windows as work — the more you choose, the quicker we can settle on a time. Optional.
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {TIME_WINDOWS.map(([v, label]) => {
+              const on = windows.includes(v);
+              return (
+                <label
+                  key={v}
+                  className={
+                    "flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2.5 text-sm transition-colors " +
+                    (on ? "border-primary bg-primary text-primary-foreground" : "border-border text-primary hover:border-accent")
+                  }
+                >
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={on}
+                    onChange={() =>
+                      setWindows((w) => (w.includes(v) ? w.filter((x) => x !== v) : [...w, v]))
+                    }
+                  />
+                  {label}
+                </label>
+              );
+            })}
+          </div>
+          {windows.length > 0 && (
+            <p className="mt-3 text-xs text-muted-foreground">
+              We'll aim for <span className="text-primary">{windowSummary(windows)}</span>.
+            </p>
+          )}
+          <label className="mt-4 grid gap-2 text-sm">
+            <span className="text-muted-foreground">
+              Anything else about your availability? Optional — a short window, a day that's better, a heads-up to call first.
+            </span>
+            <textarea
+              rows={2}
+              maxLength={400}
+              className={field}
+              placeholder="e.g. only about 30 minutes around 12:30, or after 6pm works best on weekdays"
+              value={availabilityNote}
+              onChange={(e) => setAvailabilityNote(e.target.value)}
+            />
+          </label>
         </fieldset>
 
         <div className="grid gap-4 sm:grid-cols-2">

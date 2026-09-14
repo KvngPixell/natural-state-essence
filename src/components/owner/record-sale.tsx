@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Plus, Search, X } from "lucide-react";
 import { products, skus, getSku, priceCents } from "@/data/products";
 import {
-  rpc, money, pct, fmtDate, field, button, outline, toCents, centsToInput, todayISO, errorText, PAYMENT_METHODS,
+  rpc, edge, money, pct, fmtDate, field, button, outline, toCents, centsToInput, todayISO, errorText, PAYMENT_METHODS,
 } from "@/lib/backend";
 import type { Ambassador, CustomerSummary, OrderRecord, RequestRecord } from "@/lib/program-types";
 import { Modal, Notice, Pill } from "@/components/program-ui";
@@ -237,6 +237,13 @@ export function RecordSale({
     try {
       const r = (await rpc("nsp_record_sale", { p: payload })) as OrderRecord;
       setSaved(r);
+      // Recording the sale IS accepting the order, so this is the moment the
+      // customer hears back. Deliberately not awaited into the error path: the
+      // sale is already saved, and a mail failure is surfaced in Inquiries with
+      // a retry rather than made to look like the sale itself went wrong.
+      if (requestId) {
+        void edge({ action: "confirm_order", id: requestId }).catch(() => {});
+      }
       onSaved();
     } catch (e) {
       setError(errorText(e));

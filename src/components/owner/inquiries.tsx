@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { rpc, money, fmtDateTime, button, outline, panel, field, errorText, paymentLabel } from "@/lib/backend";
+import { rpc, edge, money, fmtDateTime, button, outline, panel, field, errorText, paymentLabel } from "@/lib/backend";
 import { useOwner } from "@/components/owner/owner-context";
 import { FULFIL_METHOD_LABEL, type RequestRecord } from "@/lib/program-types";
 import { Empty, Notice, Pill } from "@/components/program-ui";
+import { windowSummary } from "@/components/order-form";
 
 const KIND_LABEL: Record<string, string> = {
   order: "Order request",
@@ -33,6 +34,24 @@ export function Inquiries() {
   async function setRequestStatus(id: string, s: string) {
     try {
       await rpc("nsp_request_status", { p_id: id, p_status: s });
+      refresh();
+    } catch (e) {
+      setError(errorText(e));
+    }
+  }
+
+  /** Re-send the "your order is confirmed" email, for when the first attempt failed. */
+  async function resendConfirmation(id: string) {
+    setError("");
+    try {
+      const r = (await edge({ action: "confirm_order", id })) as { confirmation?: string };
+      if (r.confirmation !== "accepted") {
+        setError(
+          r.confirmation === "not_configured"
+            ? "Email isn't configured, so nothing was sent."
+            : "The confirmation could not be sent. Contact the customer directly.",
+        );
+      }
       refresh();
     } catch (e) {
       setError(errorText(e));
@@ -85,6 +104,17 @@ export function Inquiries() {
                 <div className="flex flex-wrap items-center gap-2">
                   {r.ambassador_name && <Pill value="NEW" label={`Referred by ${r.ambassador_name}`} />}
                   {r.existing_customer && <Pill value="RESIDUAL" label="Existing customer" />}
+                  {/* Only flag the customer email when it needs attention — a silent failure
+                      is the one thing worse than not sending it at all. */}
+                  {r.kind === "order" && (r.receipt_status === "failed" || r.confirmation_status === "failed") && (
+                    <Pill value="disputed" label="Customer email failed" />
+                  )}
+                  {r.kind === "order" && r.confirmation_status === "accepted" && (
+                    <Pill value="fulfilled" label="Customer confirmed" />
+                  )}
+                  {r.kind === "order" && r.fulfillment_method === "delivery" && (
+                    <Pill value="awaiting_payment" label="Delivery — prepaid" />
+                  )}
                   <Pill value={r.status} />
                 </div>
               </button>
@@ -94,6 +124,13 @@ export function Inquiries() {
                     <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                       <div><dt className="text-xs text-muted-foreground">Payment</dt><dd>{paymentLabel(r.payment_method)}{r.payment_other ? ` (${r.payment_other})` : ""}</dd></div>
                       <div><dt className="text-xs text-muted-foreground">Fulfilment</dt><dd>{FULFIL_METHOD_LABEL[r.fulfillment_method ?? ""] ?? "—"}</dd></div>
+                      <div>
+                        <dt className="text-xs text-muted-foreground">Best times</dt>
+                        <dd>
+                          {r.preferred_windows?.length ? windowSummary(r.preferred_windows) : "no preference given"}
+                          {r.availability_note ? <span className="block text-xs text-muted-foreground">“{r.availability_note}”</span> : null}
+                        </dd>
+                      </div>
                       {r.order_items?.some((i) => typeof i.est_cents === "number") && (
                         <div className="col-span-2">
                           <dt className="text-xs text-muted-foreground">Estimate at list price</dt>
@@ -125,6 +162,11 @@ export function Inquiries() {
                       </button>
                     )}
                     {r.order_id && <span className="text-xs text-muted-foreground">Converted to a sale.</span>}
+                    {r.kind === "order" && r.confirmation_status !== "accepted" && r.status === "converted" && (
+                      <button className={outline} onClick={() => void resendConfirmation(r.id)}>
+                        {r.confirmation_status === "failed" ? "Retry confirmation email" : "Send confirmation email"}
+                      </button>
+                    )}
                     {r.status === "new" && <button className={outline} onClick={() => setRequestStatus(r.id, "reviewed")}>Mark reviewed</button>}
                     {!["closed", "converted"].includes(r.status) && <button className={outline} onClick={() => setRequestStatus(r.id, "closed")}>Close</button>}
                     {r.status === "closed" && <button className={outline} onClick={() => setRequestStatus(r.id, "new")}>Reopen</button>}

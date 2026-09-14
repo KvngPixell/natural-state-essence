@@ -86,5 +86,11 @@ export const PAYMENT_METHODS = [
   { value: "crypto", label: "Crypto" },
   { value: "other", label: "Other" },
 ] as const;
+/**
+ * What the public order form offers. "Other" stays in PAYMENT_METHODS so older
+ * orders still show a label in the Control Center, but customers aren't asked
+ * to describe a method we don't actually take.
+ */
+export const PAYMENT_CHOICES = PAYMENT_METHODS.filter((m) => m.value !== "other");
 export const paymentLabel = (v: string | null | undefined) =>
   PAYMENT_METHODS.find((p) => p.value === v)?.label ?? "—";

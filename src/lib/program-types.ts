@@ -249,9 +249,19 @@ export interface RequestRecord {
   payment_method: string | null;
   payment_other: string | null;
   fulfillment_method: string | null;
+  /** Two-hour windows the customer can meet, as HH-HH keys. */
+  preferred_windows: string[] | null;
+  /** Their own words about availability, for anything the slots can't express. */
+  availability_note: string | null;
   created_at: string;
   status: string;
+  /** Internal notification to us. */
   email_status: string;
+  /** Instant acknowledgement to the customer. */
+  receipt_status: string | null;
+  /** "Your order is confirmed" to the customer, sent when the sale is recorded. */
+  confirmation_status: string | null;
+  confirmation_sent_at: string | null;
   customer_id: string | null;
   order_id: string | null;
   decision_reason: string | null;
