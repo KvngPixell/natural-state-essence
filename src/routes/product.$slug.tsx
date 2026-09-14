@@ -248,7 +248,6 @@ function PricePanel({ variant }: { variant: Variant }) {
             </dl>
           )}
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-            4 vials: same per-vial price as 3. 5–9 vials: 5% off the 3-vial price. 10+: we'll quote you.
             Payment is arranged directly — cash, Cash App, Venmo or crypto. Local pickup or delivery in the
             Hot Springs, Arkansas area.
           </p>
